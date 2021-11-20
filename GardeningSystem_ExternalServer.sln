@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31410.357
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExternalServer", "Frontend\GardeningSystem_ExternalServer\ExternalServer.csproj", "{D3FDB954-D10F-43D1-8735-75EEA7F0FC6A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExternalServer", "Frontend\ExternalServer\ExternalServer.csproj", "{D3FDB954-D10F-43D1-8735-75EEA7F0FC6A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backend", "Backend", "{5C18DB9B-977C-458E-BF85-5F9D1C43BBDB}"
 EndProject
