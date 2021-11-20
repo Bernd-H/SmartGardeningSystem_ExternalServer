@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31410.357
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExternalServer", "Frontend\GardeningSystem_ExternalServer\ExternalServer.csproj", "{D3FDB954-D10F-43D1-8735-75EEA7F0FC6A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExternalServer", "Frontend\GardeningSystem_ExternalServer\ExternalServer.csproj", "{D3FDB954-D10F-43D1-8735-75EEA7F0FC6A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backend", "Backend", "{5C18DB9B-977C-458E-BF85-5F9D1C43BBDB}"
 EndProject
@@ -11,11 +11,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{9FE8FA
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend", "Frontend", "{16773863-BBA9-488B-8172-99F658FA6F14}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExternalServer.Common", "Common\ExternalServer.Common\ExternalServer.Common.csproj", "{DFA94E11-252D-40C9-B67D-15B770EF151F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExternalServer.Common", "Common\ExternalServer.Common\ExternalServer.Common.csproj", "{DFA94E11-252D-40C9-B67D-15B770EF151F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExternalServer.BusinessLogic", "Backend\ExternalServer.BusinessLogic\ExternalServer.BusinessLogic.csproj", "{8203319A-B7B4-462B-AA9D-584940912F2B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExternalServer.BusinessLogic", "Backend\ExternalServer.BusinessLogic\ExternalServer.BusinessLogic.csproj", "{8203319A-B7B4-462B-AA9D-584940912F2B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExternalServer.DataAccess", "Backend\ExternalServer.DataAccess\ExternalServer.DataAccess.csproj", "{55A6E692-A353-4FC2-A99C-151796279C13}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExternalServer.DataAccess", "Backend\ExternalServer.DataAccess\ExternalServer.DataAccess.csproj", "{55A6E692-A353-4FC2-A99C-151796279C13}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExternalServer.RestAPI", "Frontend\ExternalServer.RestAPI\ExternalServer.RestAPI.csproj", "{9A924FD6-DB22-410A-9587-36D2258BF94C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{256DA8AF-FAB1-4999-B6E1-BCAE40A9A4CB}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +46,10 @@ Global
 		{55A6E692-A353-4FC2-A99C-151796279C13}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{55A6E692-A353-4FC2-A99C-151796279C13}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{55A6E692-A353-4FC2-A99C-151796279C13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A924FD6-DB22-410A-9587-36D2258BF94C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A924FD6-DB22-410A-9587-36D2258BF94C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A924FD6-DB22-410A-9587-36D2258BF94C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A924FD6-DB22-410A-9587-36D2258BF94C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,6 +59,7 @@ Global
 		{DFA94E11-252D-40C9-B67D-15B770EF151F} = {9FE8FA7C-3D7D-4493-B90C-BC6D3FFEE9EA}
 		{8203319A-B7B4-462B-AA9D-584940912F2B} = {5C18DB9B-977C-458E-BF85-5F9D1C43BBDB}
 		{55A6E692-A353-4FC2-A99C-151796279C13} = {5C18DB9B-977C-458E-BF85-5F9D1C43BBDB}
+		{9A924FD6-DB22-410A-9587-36D2258BF94C} = {16773863-BBA9-488B-8172-99F658FA6F14}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AC355E8E-AB21-4B04-9576-7B5F1DCB153D}

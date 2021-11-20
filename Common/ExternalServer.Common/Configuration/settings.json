@@ -1,0 +1,12 @@
+﻿{
+  "applicationSettings_fileName": "settings",
+
+  /// cryptography
+  // rest api token
+  "rest_api_jwt": {
+    "issuer": "smartgardening.at"
+  },
+
+  /// Test Environment options
+  "isTestEnvironment": "true"
+}
