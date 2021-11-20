@@ -1,7 +1,11 @@
 ﻿using Autofac;
 using ExternalServer.BusinessLogic;
+using ExternalServer.BusinessLogic.Managers;
 using ExternalServer.Common.Configuration;
 using ExternalServer.Common.Specifications;
+using ExternalServer.Common.Specifications.DataAccess.Repositories;
+using ExternalServer.Common.Specifications.Managers;
+using ExternalServer.DataAccess.Repositories;
 using Microsoft.Extensions.Configuration;
 
 namespace ExternalServer {
@@ -35,43 +39,20 @@ namespace ExternalServer {
             containerBuilder.Register(c => ConfigurationContainer.Configuration).As<IConfiguration>();
             //containerBuilder.RegisterType<DevelopmentSetuper>().As<IDevelopmentSetuper>();
 
-            ///// jobs
-            //containerBuilder.RegisterType<WateringJob>().AsSelf();
-            //containerBuilder.RegisterType<CommunicationJob>().AsSelf();
+            /// jobs
 
-            ///// business logic
-            //// managers
-            //containerBuilder.RegisterType<WateringManager>().As<IWateringManager>();
-            //containerBuilder.RegisterType<ModuleManager>().As<IModuleManager>();
-            //containerBuilder.RegisterType<SettingsManager>().As<ISettingsManager>();
-            //containerBuilder.RegisterType<LocalMobileAppDiscoveryManager>().As<ILocalMobileAppDiscoveryManager>();
-            //containerBuilder.RegisterType<AesKeyExchangeManager>().As<IAesKeyExchangeManager>();
-            //containerBuilder.RegisterType<CommandManager>().As<ICommandManager>();
+            /// business logic
+            // managers
+            containerBuilder.RegisterType<SettingsManager>().As<ISettingsManager>();
+            containerBuilder.RegisterType<CertificateManager>().As<ICertificateManager>();
 
-            //// cryptography
-            //containerBuilder.RegisterType<PasswordHasher>().As<IPasswordHasher>();
-            //containerBuilder.RegisterType<AesEncrypterDecrypter>().As<IAesEncrypterDecrypter>();
-            //containerBuilder.RegisterType<CertificateHandler>().As<ICertificateHandler>();
+            // cryptography
 
-            ///// data access
-            //// repositories
-            //containerBuilder.RegisterType<FileRepository>().As<IFileRepository>();
-            //containerBuilder.RegisterGeneric(typeof(SerializedFileRepository<>)).As(typeof(ISerializedFileRepository<>)).InstancePerDependency();
-            //containerBuilder.RegisterType<ModulesRepository>().As<IModulesRepository>().SingleInstance();
-            //containerBuilder.RegisterType<RfCommunicator>().As<IRfCommunicator>().SingleInstance();
-            //containerBuilder.RegisterType<WeatherRepository>().As<IWeatherRepository>();
-            //containerBuilder.RegisterType<CertificateRepository>().As<ICertificateRepository>().SingleInstance();
+            /// data access
+            // repositories
+            containerBuilder.RegisterType<CertificateRepository>().As<ICertificateRepository>().SingleInstance();
 
-            //// communication
-            //containerBuilder.RegisterType<WifiConfigurator>().As<IWifiConfigurator>();
-            //containerBuilder.RegisterType<LocalMobileAppDiscovery>().As<ILocalMobileAppDiscovery>();
-            //containerBuilder.RegisterType<SocketSender>().As<ISocketSender>();
-            //var aesKeyExchangePort = Convert.ToInt32(ConfigurationContainer.Configuration[ConfigurationVars.AESKEYEXCHANGE_LISTENPORT]);
-            //containerBuilder.RegisterType<SslListener>().As<ISslListener>()
-            //    .WithParameter("listenerEndPoint", new IPEndPoint(IPAddress.Any, aesKeyExchangePort));
-            //var commandListenerPort = Convert.ToInt32(ConfigurationContainer.Configuration[ConfigurationVars.COMMANDLISTENER_LISTENPORT]);
-            //containerBuilder.RegisterType<AesTcpListener>().As<IAesTcpListener>()
-            //    .WithParameter("listenerEndPoint", new IPEndPoint(IPAddress.Any, commandListenerPort));
+            // communication
         }
 
         /// <summary>
