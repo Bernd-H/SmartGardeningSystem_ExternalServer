@@ -6,5 +6,10 @@ namespace ExternalServer.Common.Specifications.DataObjects {
         public IntPtr Pointer { get; set; }
 
         public long Length { get; set; }
+
+        /// <summary>
+        /// Obfuscates and frees memory.
+        /// </summary>
+        public void ClearMemory();
     }
 }

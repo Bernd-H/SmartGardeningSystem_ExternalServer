@@ -26,15 +26,19 @@ namespace ExternalServer.RestAPI.Controllers {
 
         // GET: api/<TokenController>
         [HttpGet]
-        public IActionResult Get() {
-            if (isPrivate(Request.Host.Host)) {
-                return generateJSONWebToken();
+        public IActionResult Get([FromBody] string guid) {
+            try {
+                if (isPrivate(Request.Host.Host)) {
+                    return generateJSONWebToken(Guid.Parse(guid));
+                }
+            } catch (Exception ex) {
+                Logger.Error(ex, $"[Get]Error while generating json web token for basestation with id={guid}.");
             }
 
             return Unauthorized();
         }
 
-        private IActionResult generateJSONWebToken() {
+        private IActionResult generateJSONWebToken(Guid basestationId) {
             Logger.Info($"[GenerateJSONWebToken]Generating a json web token.");
 
             try {
@@ -42,8 +46,8 @@ namespace ExternalServer.RestAPI.Controllers {
                 var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
                 var claims = new[] {
-                    //new Claim(JwtClaimTypes.UserID, userInfo.Id.ToString()),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                    new Claim(JwtRegisteredClaimNames.Typ, "basestation"),
+                    new Claim(JwtRegisteredClaimNames.Jti, basestationId.ToString())
                 };
 
                 var token = new JwtSecurityToken(Configuration[ConfigurationVars.JWT_ISSUER],
