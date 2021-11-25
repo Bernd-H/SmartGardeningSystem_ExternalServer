@@ -3,6 +3,7 @@ using System.Security.Cryptography.X509Certificates;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using ExternalServer.Common.Configuration;
+using ExternalServer.Common.Specifications.DataAccess.Repositories;
 using ExternalServer.Common.Specifications.Managers;
 using ExternalServer.RestAPI;
 using Microsoft.AspNetCore.Hosting;
@@ -16,6 +17,12 @@ namespace ExternalServer {
             var logger = NLogBuilder.ConfigureNLog("NLog.config").GetCurrentClassLogger();
             try {
                 IoC.Init();
+                //var w = IoC.Get<IUsersRepository>().AddUser(new Common.Models.Entities.User {
+                //    Id = Guid.NewGuid(),
+                //    Email = System.Text.Encoding.ASCII.GetBytes("A"),
+                //    HashedPassword = System.Text.Encoding.ASCII.GetBytes("Test1")
+                //}).Result;
+
                 // get local certificate to use for HTTPS on the rest api
                 var cert = IoC.Get<ICertificateManager>().GetCertificate();
 

@@ -51,6 +51,7 @@ namespace ExternalServer {
             /// data access
             // repositories
             containerBuilder.RegisterType<CertificateRepository>().As<ICertificateRepository>().SingleInstance();
+            containerBuilder.RegisterType<UserRepository>().As<IUserRepository>().SingleInstance();
 
             // communication
         }

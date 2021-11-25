@@ -35,6 +35,7 @@ namespace ExternalServer.RestAPI.Controllers {
         [HttpGet("{id}")]
         public ActionResult<IPEndPoint> Get(string basestationId) {
             Logger.Info($"[Get]Endpoint of basestation with id={basestationId} reqeusted from {ControllerHelperClass.GetUserId(HttpContext)}.");
+            throw new NotImplementedException();
         }
     }
 }
