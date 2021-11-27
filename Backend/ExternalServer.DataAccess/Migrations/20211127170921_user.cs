@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ExternalServer.DataAccess.Migrations
 {
-    public partial class User : Migration
+    public partial class user : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -16,7 +16,8 @@ namespace ExternalServer.DataAccess.Migrations
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     Email = table.Column<byte[]>(type: "BLOB", nullable: false),
-                    HashedPassword = table.Column<byte[]>(type: "BLOB", nullable: false)
+                    HashedPassword = table.Column<string>(type: "VARCHAR(100)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {

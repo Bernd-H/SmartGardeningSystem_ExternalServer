@@ -1,8 +1,10 @@
 ﻿using Autofac;
 using ExternalServer.BusinessLogic;
+using ExternalServer.BusinessLogic.Cryptography;
 using ExternalServer.BusinessLogic.Managers;
 using ExternalServer.Common.Configuration;
 using ExternalServer.Common.Specifications;
+using ExternalServer.Common.Specifications.Cryptography;
 using ExternalServer.Common.Specifications.DataAccess.Repositories;
 using ExternalServer.Common.Specifications.Managers;
 using ExternalServer.DataAccess.Repositories;
@@ -47,6 +49,7 @@ namespace ExternalServer {
             containerBuilder.RegisterType<CertificateManager>().As<ICertificateManager>();
 
             // cryptography
+            containerBuilder.RegisterType<PasswordHasher>().As<IPasswordHasher>();
 
             /// data access
             // repositories

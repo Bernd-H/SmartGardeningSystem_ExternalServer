@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using ExternalServer.Common.Configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -24,6 +25,13 @@ namespace ExternalServer.RestAPI {
                         ValidateIssuer = true,
                         ValidateAudience = true,
                         ValidateLifetime = true,
+                        LifetimeValidator = (notBefore, expires, securityToken, validationParameters) => {
+                            if (expires == null || expires.Value > DateTime.UtcNow) {
+                                return true;
+                            }
+
+                            return false;
+                        },
                         ValidateIssuerSigningKey = true,
                         ValidIssuer = _configuration[ConfigurationVars.JWT_ISSUER],
                         ValidAudience = _configuration[ConfigurationVars.JWT_ISSUER],

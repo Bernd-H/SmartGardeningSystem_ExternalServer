@@ -27,9 +27,9 @@ namespace ExternalServer.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("BLOB");
 
-                    b.Property<byte[]>("HashedPassword")
+                    b.Property<string>("HashedPassword")
                         .IsRequired()
-                        .HasColumnType("BLOB");
+                        .HasColumnType("VARCHAR(100)");
 
                     b.HasKey("Id");
 

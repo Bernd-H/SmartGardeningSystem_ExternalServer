@@ -33,4 +33,16 @@
     <ProjectReference Include="..\ExternalServer.RestAPI\ExternalServer.RestAPI.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="IoC.cs">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="cert.p12">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

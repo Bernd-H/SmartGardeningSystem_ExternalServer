@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 using ExternalServer.Common.Specifications;
 using ExternalServer.Common.Specifications.Managers;
 using Microsoft.AspNetCore.Authorization;
@@ -24,18 +21,28 @@ namespace ExternalServer.RestAPI.Controllers {
             ConnectionsManager = connectionsManager;
         }
 
-        // GET: api/<IPLookupController>
-        [HttpGet]
-        public IEnumerable<string> Get() {
-            //return new string[] { "value1", "value2" };
-            throw new NotImplementedException();
-        }
-
         // GET api/<IPLookupController>/5
         [HttpGet("{id}")]
         public ActionResult<IPEndPoint> Get(string basestationId) {
-            Logger.Info($"[Get]Endpoint of basestation with id={basestationId} reqeusted from {ControllerHelperClass.GetUserId(HttpContext)}.");
-            throw new NotImplementedException();
+            if (ControllerHelperClass.CallerIsUser(HttpContext)) {
+                Logger.Info($"[Get]Endpoint of basestation with id={basestationId} reqeusted from {ControllerHelperClass.GetUserId(HttpContext)}.");
+                throw new NotImplementedException();
+            }
+            else {
+                return Unauthorized();
+            }
+        }
+
+        // POST api/<IPLookupController>
+        [HttpPost]
+        public IActionResult Post([FromBody] string basestationId) {
+            if (ControllerHelperClass.CallerIsBasestation(HttpContext)) {
+                Logger.Info($"[Get]Endpoint of basestation with id={basestationId} reqeusted from {ControllerHelperClass.GetUserId(HttpContext)}.");
+                throw new NotImplementedException();
+            }
+            else {
+                return Unauthorized();
+            }
         }
     }
 }

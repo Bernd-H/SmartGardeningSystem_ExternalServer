@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using ExternalServer.Common.Models.Entities;
 using ExternalServer.Common.Specifications;
@@ -23,10 +24,23 @@ namespace ExternalServer.DataAccess.Repositories {
             return await RemoveFromTable(user) == 1;
         }
 
+        public async Task<bool> UpdateUser(User updatedUser) {
+            return await UpdateObject(updatedUser);
+        }
+
         public async Task<User> QueryByEmail(byte[] email) {
             await LOCKER.WaitAsync();
 
             var user = context.Users.Where(u => u.Email == email).FirstOrDefault();
+
+            LOCKER.Release();
+            return user;
+        }
+
+        public async Task<User> QueryById(Guid Id) {
+            await LOCKER.WaitAsync();
+
+            var user = context.Users.Where(u => u.Id == Id).FirstOrDefault();
 
             LOCKER.Release();
             return user;

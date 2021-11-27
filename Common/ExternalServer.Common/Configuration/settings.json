@@ -1,8 +1,8 @@
 ﻿{
   "applicationSettings_fileName": "settings",
 
-  //"certificate_filePath": "~/smartGardening/cert.p12",
-  "certificate_filePath": "C:\\Users\\bernd\\Documents\\Schule\\Diplomarbeit\\XCADatenbank\\djcodex.com\\cert.p12",
+  "certificate_filePath": "cert.p12",
+  //"certificate_filePath": "C:\\Users\\bernd\\Documents\\Schule\\Diplomarbeit\\XCADatenbank\\djcodex.com\\cert.p12",
 
   /// cryptography
   // rest api token

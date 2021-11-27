@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ExternalServer.DataAccess.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20211125191850_User")]
-    partial class User
+    [Migration("20211127170921_user")]
+    partial class user
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -29,9 +29,9 @@ namespace ExternalServer.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("BLOB");
 
-                    b.Property<byte[]>("HashedPassword")
+                    b.Property<string>("HashedPassword")
                         .IsRequired()
-                        .HasColumnType("BLOB");
+                        .HasColumnType("VARCHAR(100)");
 
                     b.HasKey("Id");
 

@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using ExternalServer.Common.Configuration;
 using ExternalServer.Common.Specifications;
+using ExternalServer.Common.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -24,10 +25,11 @@ namespace ExternalServer.RestAPI.Controllers {
             Configuration = configuration;
         }
 
-        // GET: api/<TokenController>
-        [HttpGet]
-        public IActionResult Get([FromBody] string guid) {
+        // POST: api/<TokenController>
+        [HttpPost]
+        public IActionResult GetToken([FromBody] string guid) {
             try {
+                Logger.Info($"[Get]Basestation token requested from {Request.Host.Host}.");
                 if (isPrivate(Request.Host.Host)) {
                     return generateJSONWebToken(Guid.Parse(guid));
                 }
@@ -46,8 +48,8 @@ namespace ExternalServer.RestAPI.Controllers {
                 var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
                 var claims = new[] {
-                    new Claim(JwtRegisteredClaimNames.Typ, "basestation"),
-                    new Claim(JwtRegisteredClaimNames.Jti, basestationId.ToString())
+                    new Claim(JwtClaimTypes.TYPE, "basestation"),
+                    new Claim(JwtClaimTypes.USER_ID, basestationId.ToString())
                 };
 
                 var token = new JwtSecurityToken(Configuration[ConfigurationVars.JWT_ISSUER],

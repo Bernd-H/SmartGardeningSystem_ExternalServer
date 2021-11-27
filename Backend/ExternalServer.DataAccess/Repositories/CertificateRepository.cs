@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using ExternalServer.Common.Models.Entities;
 using ExternalServer.Common.Specifications;
@@ -32,9 +33,12 @@ namespace ExternalServer.DataAccess.Repositories {
                 }
             }
             else {
-                Logger.Info("[GetCertificate]Loading certificate from X509Store.");
+                Logger.Info($"[GetCertificate]Loading certificate from {filePath}.");
                 var cert = getCertificate(filePath);
-                cachedCertificates.Add(filePath, new CachedObject(cert));
+                if (cert != null) {
+                    cachedCertificates.Add(filePath, new CachedObject(cert));
+                }
+
                 return cert;
             }
         }
@@ -43,8 +47,12 @@ namespace ExternalServer.DataAccess.Repositories {
         /// Gets certificate with specified certThumbprint from the specified StoreLocation
         /// </summary>
         private static X509Certificate2 getCertificate(string filePath) {
-            X509Certificate2 cert = new X509Certificate2(filePath, "6IBI7pm2huL4");
-            return cert;
+            //try {
+                X509Certificate2 cert = new X509Certificate2(filePath, "6IBI7pm2huL4");
+                return cert;
+            //} catch (Exception) {
+            //    return null;
+            //}
         }
     }
 }

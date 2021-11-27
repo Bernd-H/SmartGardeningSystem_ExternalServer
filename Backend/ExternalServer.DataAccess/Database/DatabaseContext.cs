@@ -8,6 +8,7 @@ namespace ExternalServer.DataAccess.Database {
 
         protected override void OnConfiguring(DbContextOptionsBuilder dbContextOptionsBuilder) {
             string connectionString = "Data Source=localhost;Initial Catalog=SmartGardening;User ID=root;Password=";
+            //string connectionString = "Data Source=localhost;Initial Catalog=smartgardening;User ID=root;Password=hBSoZl1u5v6k";
             dbContextOptionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
         }
     }

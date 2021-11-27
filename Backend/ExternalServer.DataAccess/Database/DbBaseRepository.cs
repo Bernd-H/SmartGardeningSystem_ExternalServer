@@ -36,9 +36,26 @@ namespace ExternalServer.DataAccess.Database {
 
             context.Remove(o);
             int numberOfWrittenStateEntries = await context.SaveChangesAsync(cancellationToken);
-
+            
             LOCKER.Release();
             return numberOfWrittenStateEntries;
+        }
+
+        protected async Task<bool> UpdateObject(T o, CancellationToken cancellationToken = default) {
+            await LOCKER.WaitAsync();
+            Logger.Trace($"[RemoveFromTable]Removing object with id {o.Id} from table {nameof(T)}.");
+            int numberOfWrittenStateEntries = 0;
+
+            var entity = context.Find(typeof(T), o.Id);
+            if (entity != null) {
+                // udpate
+                context.Entry(entity).CurrentValues.SetValues(o);
+
+                numberOfWrittenStateEntries = await context.SaveChangesAsync(cancellationToken);
+            }
+
+            LOCKER.Release();
+            return numberOfWrittenStateEntries == 1;
         }
 
         public void Dispose() {
