@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Net;
+using ExternalServer.Common.Models.DTOs;
 using ExternalServer.Common.Specifications;
+using ExternalServer.Common.Specifications.DataAccess.Repositories;
 using ExternalServer.Common.Specifications.Managers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,11 +16,14 @@ namespace ExternalServer.RestAPI.Controllers {
 
         private IConnectionsManager ConnectionsManager;
 
+        private IBasestationIpRepository BasestationIpRepository;
+
         private ILogger Logger;
 
-        public IPLookupController(ILoggerService loggerService, IConnectionsManager connectionsManager) {
+        public IPLookupController(ILoggerService loggerService, IConnectionsManager connectionsManager, IBasestationIpRepository basestationIpRepository) {
             Logger = loggerService.GetLogger<IPLookupController>();
             ConnectionsManager = connectionsManager;
+            BasestationIpRepository = basestationIpRepository;
         }
 
         // GET api/<IPLookupController>/5
@@ -35,10 +40,26 @@ namespace ExternalServer.RestAPI.Controllers {
 
         // POST api/<IPLookupController>
         [HttpPost]
-        public IActionResult Post([FromBody] string basestationId) {
+        public IActionResult UpdateBasestationIP([FromBody] IPStatusDto ipStatus) {
             if (ControllerHelperClass.CallerIsBasestation(HttpContext)) {
-                Logger.Info($"[Get]Endpoint of basestation with id={basestationId} reqeusted from {ControllerHelperClass.GetUserId(HttpContext)}.");
-                throw new NotImplementedException();
+                string id = ControllerHelperClass.GetUserId(HttpContext);
+                Logger.Info($"[UpdateBasestationIP]Updating ip from basestation with id={id}.");
+                if (ipStatus.Id != Guid.Parse(id)) {
+                    Logger.Error($"[UpdateBasestationIP]Wrong basestation id.");
+                    return Problem("Wrong basestation id.");
+                }
+
+                // update ip in database
+                var success = BasestationIpRepository.UpdateOrAddBasestation(new Common.Models.Entities.BasestationIP {
+                    Id = ipStatus.Id,
+                    Ip = ipStatus.Ip
+                }).Result;
+
+                if (success) {
+                    return Ok();
+                }
+
+                return Problem();
             }
             else {
                 return Unauthorized();
