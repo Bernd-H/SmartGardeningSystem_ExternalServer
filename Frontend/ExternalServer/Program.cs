@@ -3,10 +3,11 @@ using System.Security.Cryptography.X509Certificates;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using ExternalServer.Common.Configuration;
-using ExternalServer.Common.Specifications.DataAccess.Repositories;
 using ExternalServer.Common.Specifications.Managers;
+using ExternalServer.Jobs;
 using ExternalServer.RestAPI;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog.Web;
@@ -17,11 +18,6 @@ namespace ExternalServer {
             var logger = NLogBuilder.ConfigureNLog("NLog.config").GetCurrentClassLogger();
             try {
                 IoC.Init();
-                //var w = IoC.Get<IUsersRepository>().AddUser(new Common.Models.Entities.User {
-                //    Id = Guid.NewGuid(),
-                //    Email = System.Text.Encoding.ASCII.GetBytes("A"),
-                //    HashedPassword = System.Text.Encoding.ASCII.GetBytes("Test1")
-                //}).Result;
 
                 // get local certificate to use for HTTPS on the rest api
                 var cert = IoC.Get<ICertificateManager>().GetCertificate();
@@ -68,7 +64,8 @@ namespace ExternalServer {
                             if (x509Certificate != null && x509Certificate.HasPrivateKey) {
                                 // Configure Kestrel to use a certificate from a local .PFX file for hosting HTTPS
                                 opts.UseHttps(x509Certificate);
-                            } else {
+                            }
+                            else {
                                 logger.Warn("[CreateHostBuilder]No local certificate for the rest api.");
                                 opts.UseHttps();
                             }
@@ -83,11 +80,10 @@ namespace ExternalServer {
                     //{
                     //    services.AddHostedService<WateringJob>();
                     //}
-                    //// other services
-                    //if (Convert.ToBoolean(ConfigurationContainer.Configuration[ConfigurationVars.COMMUNICATIONJOB_ENABLED]))
-                    //{
-                    //    services.AddHostedService<CommunicationJob>();
-                    //}
+                    // other services
+                    if (Convert.ToBoolean(ConfigurationContainer.Configuration[ConfigurationVars.CONNECTORJOB_ENABLED])) {
+                        services.AddHostedService<ConnectorJob>();
+                    }
                 });
     }
 }

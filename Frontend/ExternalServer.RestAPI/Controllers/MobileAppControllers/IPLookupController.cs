@@ -26,44 +26,44 @@ namespace ExternalServer.RestAPI.Controllers {
             BasestationIpRepository = basestationIpRepository;
         }
 
-        // GET api/<IPLookupController>/5
-        [HttpGet("{id}")]
-        public ActionResult<IPEndPoint> Get(string basestationId) {
-            if (ControllerHelperClass.CallerIsUser(HttpContext)) {
-                Logger.Info($"[Get]Endpoint of basestation with id={basestationId} reqeusted from {ControllerHelperClass.GetUserId(HttpContext)}.");
-                throw new NotImplementedException();
-            }
-            else {
-                return Unauthorized();
-            }
-        }
+        //// GET api/<IPLookupController>/5
+        //[HttpGet("{id}")]
+        //public ActionResult<IPEndPoint> Get(string basestationId) {
+        //    if (ControllerHelperClass.CallerIsUser(HttpContext)) {
+        //        Logger.Info($"[Get]Endpoint of basestation with id={basestationId} reqeusted from {ControllerHelperClass.GetUserId(HttpContext)}.");
+        //        throw new NotImplementedException();
+        //    }
+        //    else {
+        //        return Unauthorized();
+        //    }
+        //}
 
-        // POST api/<IPLookupController>
-        [HttpPost]
-        public IActionResult UpdateBasestationIP([FromBody] IPStatusDto ipStatus) {
-            if (ControllerHelperClass.CallerIsBasestation(HttpContext)) {
-                string id = ControllerHelperClass.GetUserId(HttpContext);
-                Logger.Info($"[UpdateBasestationIP]Updating ip from basestation with id={id}.");
-                if (ipStatus.Id != Guid.Parse(id)) {
-                    Logger.Error($"[UpdateBasestationIP]Wrong basestation id.");
-                    return Problem("Wrong basestation id.");
-                }
+        //// POST api/<IPLookupController>
+        //[HttpPost]
+        //public IActionResult UpdateBasestationIP([FromBody] IPStatusDto ipStatus) {
+        //    if (ControllerHelperClass.CallerIsBasestation(HttpContext)) {
+        //        string id = ControllerHelperClass.GetUserId(HttpContext);
+        //        Logger.Info($"[UpdateBasestationIP]Updating ip from basestation with id={id}.");
+        //        if (ipStatus.Id != Guid.Parse(id)) {
+        //            Logger.Error($"[UpdateBasestationIP]Wrong basestation id.");
+        //            return Problem("Wrong basestation id.");
+        //        }
 
-                // update ip in database
-                var success = BasestationIpRepository.UpdateOrAddBasestation(new Common.Models.Entities.BasestationIP {
-                    Id = ipStatus.Id,
-                    Ip = ipStatus.Ip
-                }).Result;
+        //        // update ip in database
+        //        var success = BasestationIpRepository.UpdateOrAddBasestation(new Common.Models.Entities.BasestationIP {
+        //            Id = ipStatus.Id,
+        //            Ip = ipStatus.Ip
+        //        }).Result;
 
-                if (success) {
-                    return Ok();
-                }
+        //        if (success) {
+        //            return Ok();
+        //        }
 
-                return Problem();
-            }
-            else {
-                return Unauthorized();
-            }
-        }
+        //        return Problem();
+        //    }
+        //    else {
+        //        return Unauthorized();
+        //    }
+        //}
     }
 }

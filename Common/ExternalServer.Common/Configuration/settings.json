@@ -10,6 +10,14 @@
     "issuer": "smartgardening.at"
   },
 
+  // Client Relay
+  "connectorJob_CleanupInterval_h": "12",
+  "mobileAppRelayService_port": "5040",
+  "basetationConnectionService_port": "5039",
+
   /// Test Environment options
-  "isTestEnvironment": "true"
+  "isTestEnvironment": "true",
+
+  // Jobs
+  "connectorJob_enabled": "true"
 }

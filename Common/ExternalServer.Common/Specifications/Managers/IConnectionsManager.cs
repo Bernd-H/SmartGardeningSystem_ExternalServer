@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Net;
 using System.Threading;
+using ExternalServer.Common.Specifications.DataObjects;
 
 namespace ExternalServer.Common.Specifications.Managers {
     public interface IConnectionsManager {
@@ -16,8 +16,8 @@ namespace ExternalServer.Common.Specifications.Managers {
         /// If that fails, all traffic will be relayed threw this server.
         /// </summary>
         /// <param name="basestationId"></param>
-        /// <returns>The Endpoint the client should send it's request to. NULL if there is no connection to the basestation.</returns>
-        IPEndPoint SendUserConnectRequest(Guid basestationId);
+        /// <returns>Containes if the baseastion was reachable and the Endpoint of the basestation if peer to peer is possible.</returns>
+        IRelayRequestResult SendUserConnectRequest(Guid basestationId);
 
         /// <summary>
         /// Removes closed connections from the list.

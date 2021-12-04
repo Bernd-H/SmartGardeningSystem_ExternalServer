@@ -6,10 +6,15 @@ using System.Net.Security;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using ExternalServer.Common.Configuration;
+using ExternalServer.Common.Models.Entities;
 using ExternalServer.Common.Specifications;
 using ExternalServer.Common.Specifications.DataAccess.Communication;
+using ExternalServer.Common.Specifications.DataObjects;
 using ExternalServer.Common.Specifications.Managers;
 using ExternalServer.Common.Utilities;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using NLog;
 
 namespace ExternalServer.BusinessLogic.Managers {
@@ -24,14 +29,16 @@ namespace ExternalServer.BusinessLogic.Managers {
 
         private Dictionary<Guid, Connection> _connections;
 
+        private IConfiguration Configuration;
 
         private ISslListener SslListener;
 
         private ILogger Logger;
 
-        public ConnectionsManager(ILoggerService loggerService, ISslListener sslListener) {
+        public ConnectionsManager(ILoggerService loggerService, ISslListener sslListener, IConfiguration configuration) {
             Logger = loggerService.GetLogger<ConnectionsManager>();
             SslListener = sslListener;
+            Configuration = configuration;
 
             _connections = new Dictionary<Guid, Connection>();
         }
@@ -53,23 +60,36 @@ namespace ExternalServer.BusinessLogic.Managers {
             }
         }
 
-        public IPEndPoint SendUserConnectRequest(Guid basestationId) {
+        public IRelayRequestResult SendUserConnectRequest(Guid basestationId) {
             try {
                 if (_connections.ContainsKey(basestationId)) {
                     var connection = _connections[basestationId];
-                    if (connection.client.Client.IsConnected()) {
-                        // notify client and ask if peer to peer is possible
-                        DataAccess.Communication.SslListener.SendMessage(connection.stream, CommunicationCodes.SendPeerToPeerEndPoint);
+                    if (connection.client.Client.IsConnected_UsingPoll()) {
 
-                        var endPoint = DataAccess.Communication.SslListener.ReadMessage(connection.stream);
+                        lock (connection) { // only one client can establish a connection with the basestation at the same time
+                            // notify basesation and ask if peer to peer is possible
+                            var buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new WanPackage {
+                                Package = CommunicationCodes.SendPeerToPeerEndPoint,
+                                PackageType = PackageType.Init
+                            }));
+                            DataAccess.Communication.SslListener.SendMessage(connection.stream, buffer);
 
-                        if (endPoint.SequenceEqual(CommunicationCodes.NoPeerToPeerPossible)) {
-                            // relay mobile app traffic over this server
-                            return InitiateRelay(connection);
-                        }
-                        else {
-                            // basestation managed to open a publicly accessable port
-                            return IPEndPoint.Parse(Encoding.UTF8.GetString(endPoint));
+                            var answer = DataAccess.Communication.SslListener.ReadMessage(connection.stream);
+                            var answerO = JsonConvert.DeserializeObject(Encoding.UTF8.GetString(answer)) as WanPackage;
+
+                            if (answerO.Package.Length != 0) { // no peer to peer possible
+                                // relay mobile app traffic over this server
+                                return new RelayRequestResult() {
+                                    basestationStream = connection.stream
+                                };
+                            }
+                            else {
+                                // basestation managed to open a publicly accessable port
+                                return new RelayRequestResult() {
+                                    PeerToPeerEndPoint = IPEndPoint.Parse(Encoding.UTF8.GetString(answerO.Package)),
+                                    basestationStream = connection.stream
+                                };
+                            }
                         }
                     }
                     else {
@@ -85,16 +105,17 @@ namespace ExternalServer.BusinessLogic.Managers {
                 RemoveConnection(basestationId);
             }
 
-            return null;
+            return new RelayRequestResult();
         }
 
         public void Start(CancellationToken token) {
-            SslListener.Start(token, new IPEndPoint(IPAddress.Any, 5039), ClientConnected, 60000);
+            int port = Convert.ToInt32(Configuration[ConfigurationVars.BASESTATIONCONNECTIONSERVICE_PORT]);
+            SslListener.Start(token, new IPEndPoint(IPAddress.Any, port), ClientConnected, 0);
         }
 
         private void ClientConnected(SslStream stream, TcpClient client) {
             try {
-                // receive key
+                // receive id
                 var basestationId = DataAccess.Communication.SslListener.ReadMessage(stream);
 
                 // send ack
@@ -116,10 +137,6 @@ namespace ExternalServer.BusinessLogic.Managers {
                 // this stream will also close the underlying client
                 stream?.Close();
             }
-        }
-
-        private IPEndPoint InitiateRelay(Connection connection) {
-            throw new NotImplementedException();
         }
 
         private void RemoveConnection(Guid basestationId) {
