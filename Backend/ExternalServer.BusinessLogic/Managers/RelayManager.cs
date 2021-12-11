@@ -40,7 +40,8 @@ namespace ExternalServer.BusinessLogic.Managers {
         public void Start(CancellationToken cancellationToken) {
             _cancellationToken = cancellationToken;
             int port = Convert.ToInt32(Configuration[ConfigurationVars.MOBILEAPPRELAYSERVICE_PORT]);
-            SslListener.Start(cancellationToken, new IPEndPoint(IPAddress.Any, port), MoblieAppConnected, keepAliveInterval: 0);
+            Logger.Info($"[Start]Starting RelayManager.");
+            SslListener.Start(cancellationToken, new IPEndPoint(IPAddress.Any, port), MoblieAppConnected, keepAliveInterval: 0, receiveTimeout: -1);
         }
 
         private void MoblieAppConnected(SslStream stream, TcpClient tcpClient) {
@@ -50,9 +51,12 @@ namespace ExternalServer.BusinessLogic.Managers {
                 try {
                     // get the Basestation Id the client want's to connect to
                     var basestationIdBytes = DataAccess.Communication.SslListener.ReadMessage(stream);
+                    var basestationId = new Guid(basestationIdBytes);
+
+                    Logger.Info($"[MoblieAppConnected]Forwarding connect request to basestation with id={basestationId}.");
 
                     // send conenction request to basestation
-                    var relayRequestResult = ConnectionsManager.SendUserConnectRequest(new Guid(basestationIdBytes));
+                    var relayRequestResult = ConnectionsManager.SendUserConnectRequest(basestationId);
 
                     // send client back IRelayRequestResult
                     byte[] answer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(relayRequestResult.ToDto()));
@@ -65,21 +69,28 @@ namespace ExternalServer.BusinessLogic.Managers {
 
                     if (relayRequestResult.basestationStream != null && relayRequestResult.PeerToPeerEndPoint == null) {
                         // peer to peer connection is not possible due to the basestations NAT
+                        Logger.Info($"[MoblieAppConnected]Relaying packages from {tcpClient.Client.RemoteEndPoint} to {basestationId}.");
 
                         while (true) {
                             // tunnel messages
                             var bytes_fromClient = DataAccess.Communication.SslListener.ReadMessage(stream);
+                            Logger.Info($"[MoblieAppConnected]Tunneling {bytes_fromClient.Length} bytes to basestation.");
                             DataAccess.Communication.SslListener.SendMessage(relayRequestResult.basestationStream, bytes_fromClient);
                             var bytes_fromBasestation = DataAccess.Communication.SslListener.ReadMessage(relayRequestResult.basestationStream);
+                            Logger.Info($"[MobileAppConnected]Tunneling {bytes_fromBasestation.Length} bytes to client.");
                             DataAccess.Communication.SslListener.SendMessage(stream, bytes_fromBasestation);
                         }
                     }
+                    else if (relayRequestResult.basestationStream != null && relayRequestResult.PeerToPeerEndPoint != null) {
+                        Logger.Info($"[MoblieAppConnected]Sent {tcpClient.Client.RemoteEndPoint} a peer to peer endpoint from {basestationId}.");
+                    }
                     else {
+                        // basestation is not connected to the server
                         // connection will get closed at the end
                     }
                 }
-                catch (Exception) {
-
+                catch (Exception ex) {
+                    Logger.Error(ex, $"[MobileAppConnected]An error occured.");
                 }
             }, _cancellationToken).ContinueWith(task => {
                 // closes also the underlying stream

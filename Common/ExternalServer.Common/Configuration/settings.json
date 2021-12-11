@@ -11,6 +11,7 @@
   },
 
   // Client Relay
+  //"connectorJob_CleanupInterval_h": "0.01", // 36s
   "connectorJob_CleanupInterval_h": "12",
   "mobileAppRelayService_port": "5040",
   "basetationConnectionService_port": "5039",

@@ -41,7 +41,7 @@ namespace ExternalServer.DataAccess.Repositories {
         public async Task<BasestationIP> QueryById(Guid Id) {
             await LOCKER.WaitAsync();
 
-            var bip = context.BasestationIPs.Where(u => u.Id == Id).FirstOrDefault();
+            var bip = context.basestationIPs.Where(u => u.Id == Id).FirstOrDefault();
 
             LOCKER.Release();
             return bip;

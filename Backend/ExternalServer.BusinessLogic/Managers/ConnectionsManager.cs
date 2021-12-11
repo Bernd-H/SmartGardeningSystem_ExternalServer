@@ -54,6 +54,7 @@ namespace ExternalServer.BusinessLogic.Managers {
                     }
                 }
 
+                Logger.Info($"[CleanupGhostConenctions]Removing {connectionsToRemove.Count} connections.");
                 foreach (var idToRemove in connectionsToRemove) {
                     _connections.Remove(idToRemove);
                 }
@@ -75,18 +76,19 @@ namespace ExternalServer.BusinessLogic.Managers {
                             DataAccess.Communication.SslListener.SendMessage(connection.stream, buffer);
 
                             var answer = DataAccess.Communication.SslListener.ReadMessage(connection.stream);
-                            var answerO = JsonConvert.DeserializeObject(Encoding.UTF8.GetString(answer)) as WanPackage;
+                            var answerO = JsonConvert.DeserializeObject<WanPackage>(Encoding.UTF8.GetString(answer));
 
-                            if (answerO.Package.Length != 0) { // no peer to peer possible
-                                // relay mobile app traffic over this server
+                            if (answerO.Package?.Length > 0) {
+                                // basestation managed to open a publicly accessable port
                                 return new RelayRequestResult() {
+                                    PeerToPeerEndPoint = IPEndPoint.Parse(Encoding.UTF8.GetString(answerO.Package)),
                                     basestationStream = connection.stream
                                 };
                             }
                             else {
-                                // basestation managed to open a publicly accessable port
+                                // no peer to peer possible
+                                // relay mobile app traffic over this server
                                 return new RelayRequestResult() {
-                                    PeerToPeerEndPoint = IPEndPoint.Parse(Encoding.UTF8.GetString(answerO.Package)),
                                     basestationStream = connection.stream
                                 };
                             }
@@ -110,21 +112,27 @@ namespace ExternalServer.BusinessLogic.Managers {
 
         public void Start(CancellationToken token) {
             int port = Convert.ToInt32(Configuration[ConfigurationVars.BASESTATIONCONNECTIONSERVICE_PORT]);
-            SslListener.Start(token, new IPEndPoint(IPAddress.Any, port), ClientConnected, 0);
+            SslListener.Start(token, new IPEndPoint(IPAddress.Any, port), ClientConnected, keepAliveInterval: 0, receiveTimeout: 5000);
         }
 
         private void ClientConnected(SslStream stream, TcpClient client) {
             try {
                 // receive id
-                var basestationId = DataAccess.Communication.SslListener.ReadMessage(stream);
+                var basestationIdBytes = DataAccess.Communication.SslListener.ReadMessage(stream);
+                var basestationId = new Guid(basestationIdBytes);
 
                 // send ack
                 DataAccess.Communication.SslListener.SendMessage(stream, CommunicationCodes.ACK);
 
-                Logger.Info($"[ClientConnected]Accommodate bastation with id={basestationId} to the list.");
+                Logger.Info($"[ClientConnected]Accommodate bastation with id={basestationId.ToString()} to the list.");
 
                 lock (_connections) {
-                    _connections.Add(new Guid(basestationId), new Connection {
+                    if (_connections.ContainsKey(basestationId)) {
+                        _connections[basestationId].stream?.Close();
+                        _connections.Remove(basestationId);
+                    }
+
+                    _connections.Add(basestationId, new Connection {
                         client = client,
                         stream = stream
                     });

@@ -17,6 +17,7 @@ namespace ExternalServer.Common.Specifications.DataAccess.Communication {
         /// <param name="endPoint"></param>
         /// <param name="sslStreamOpenCallback">Must close the sslStream at the end.</param>
         /// <param name="keepAliveInterval">0 or less, to deactivate keep alive. Value in ms.</param>
-        void Start(CancellationToken token, IPEndPoint endPoint, SslStreamOpenCallback sslStreamOpenCallback, int keepAliveInterval);
+        /// <param name="receiveTimeout"></param>
+        void Start(CancellationToken token, IPEndPoint endPoint, SslStreamOpenCallback sslStreamOpenCallback, int keepAliveInterval, int receiveTimeout);
     }
 }

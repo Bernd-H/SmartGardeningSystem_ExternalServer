@@ -24,6 +24,8 @@ namespace ExternalServer.DataAccess.Communication {
 
         private int _keepAliveInterval;
 
+        private int _receiveTimeout;
+
 
         private ICertificateManager CertificateManager;
 
@@ -34,14 +36,15 @@ namespace ExternalServer.DataAccess.Communication {
             CertificateManager = certificateManager;
         }
 
-        public void Start(CancellationToken token, IPEndPoint endPoint, SslStreamOpenCallback sslStreamOpenCallback, int keepAliveInterval) {
+        public void Start(CancellationToken token, IPEndPoint endPoint, SslStreamOpenCallback sslStreamOpenCallback, int keepAliveInterval, int receiveTimeout) {
             _sslStreamOpenCallback = sslStreamOpenCallback;
             _keepAliveInterval = keepAliveInterval;
+            _receiveTimeout = receiveTimeout;
 
             _workingThread = new Thread(() => {
                 _tcpListener = new TcpListener(endPoint);
-                _tcpListener.Server.ReceiveTimeout = 1000; // 1s
-                _tcpListener.Server.SendTimeout = 1000;
+                _tcpListener.Server.ReceiveTimeout = receiveTimeout;
+                _tcpListener.Server.SendTimeout = 5000;
 
                 _tcpListener.Start();
                 token.Register(() => _tcpListener.Stop());
@@ -80,8 +83,8 @@ namespace ExternalServer.DataAccess.Communication {
                 sslStream = new SslStream(client.GetStream(), false);
 
                 // Set timeouts for the read and write to 1 second.
-                sslStream.ReadTimeout = 1000;
-                sslStream.WriteTimeout = 1000;
+                sslStream.ReadTimeout = _receiveTimeout;
+                sslStream.WriteTimeout = 5000;
 
                 sslStream.AuthenticateAsServer(CertificateManager.GetCertificate(), clientCertificateRequired: false, checkCertificateRevocation: true);
 
@@ -108,6 +111,8 @@ namespace ExternalServer.DataAccess.Communication {
 
         private void ConfigureKeepAlive(TcpClient client) {
             if (_keepAliveInterval > 0) {
+                Logger.Info($"[ConfigureKeepAlive]Settings keep alive interval to {_keepAliveInterval}ms for connection with endpoint {client.Client.RemoteEndPoint}.");
+
                 // Get the size of the uint to use to back the byte array
                 int size = Marshal.SizeOf((uint)0);
 

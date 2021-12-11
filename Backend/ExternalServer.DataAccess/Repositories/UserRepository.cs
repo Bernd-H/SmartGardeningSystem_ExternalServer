@@ -31,7 +31,7 @@ namespace ExternalServer.DataAccess.Repositories {
         public async Task<User> QueryByEmail(byte[] email) {
             await LOCKER.WaitAsync();
 
-            var user = context.Users.Where(u => u.Email == email).FirstOrDefault();
+            var user = context.users.Where(u => u.Email == email).FirstOrDefault();
 
             LOCKER.Release();
             return user;
@@ -40,7 +40,7 @@ namespace ExternalServer.DataAccess.Repositories {
         public async Task<User> QueryById(Guid Id) {
             await LOCKER.WaitAsync();
 
-            var user = context.Users.Where(u => u.Id == Id).FirstOrDefault();
+            var user = context.users.Where(u => u.Id == Id).FirstOrDefault();
 
             LOCKER.Release();
             return user;

@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ExternalServer.DataAccess.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20211127170921_user")]
-    partial class user
+    [Migration("20211210183507_User")]
+    partial class User
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -18,6 +18,21 @@ namespace ExternalServer.DataAccess.Migrations
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 64)
                 .HasAnnotation("ProductVersion", "5.0.12");
+
+            modelBuilder.Entity("ExternalServer.Common.Models.Entities.BasestationIP", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Ip")
+                        .IsRequired()
+                        .HasColumnType("VARCHAR(15)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("basestationIPs");
+                });
 
             modelBuilder.Entity("ExternalServer.Common.Models.Entities.User", b =>
                 {
@@ -35,7 +50,7 @@ namespace ExternalServer.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("users");
                 });
 #pragma warning restore 612, 618
         }

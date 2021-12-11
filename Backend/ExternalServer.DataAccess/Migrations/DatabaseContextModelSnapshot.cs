@@ -29,7 +29,7 @@ namespace ExternalServer.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BasestationIPs");
+                    b.ToTable("basestationIPs");
                 });
 
             modelBuilder.Entity("ExternalServer.Common.Models.Entities.User", b =>
@@ -48,7 +48,7 @@ namespace ExternalServer.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("users");
                 });
 #pragma warning restore 612, 618
         }
