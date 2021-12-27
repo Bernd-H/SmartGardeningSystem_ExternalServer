@@ -9,6 +9,7 @@ using System.Threading;
 using ExternalServer.Common.Specifications;
 using ExternalServer.Common.Specifications.DataAccess.Communication;
 using ExternalServer.Common.Specifications.Managers;
+using ExternalServer.Common.Utilities;
 using NLog;
 
 namespace ExternalServer.DataAccess.Communication {
@@ -132,46 +133,12 @@ namespace ExternalServer.DataAccess.Communication {
             }
         }
 
-        public static void SendMessage(SslStream sslStream, byte[] msg) {
-            List<byte> packet = new List<byte>();
-
-            // add length of packet - 4B
-            packet.AddRange(BitConverter.GetBytes(msg.Length + 4));
-
-            // add content
-            packet.AddRange(msg);
-
-            sslStream.Write(packet.ToArray());
-            sslStream.Flush();
+        public void SendMessage(SslStream sslStream, byte[] msg) {
+            CommunicationUtils.Send(Logger, msg, sslStream);
         }
 
-        public static byte[] ReadMessage(SslStream sslStream) {
-            int bytes = -1;
-            int packetLength = -1;
-            int readBytes = 0;
-            List<byte> packet = new List<byte>();
-
-            do {
-                byte[] buffer = new byte[2048];
-                bytes = sslStream.Read(buffer, 0, buffer.Length);
-
-                // get length
-                if (packetLength == -1) {
-                    byte[] length = new byte[4];
-                    Array.Copy(buffer, 0, length, 0, 4);
-                    packetLength = BitConverter.ToInt32(length, 0);
-                }
-
-                readBytes += bytes;
-                packet.AddRange(buffer);
-
-            } while (bytes != 0 && packetLength - readBytes > 0);
-
-            // remove length information and attached bytes
-            packet.RemoveRange(packetLength, packet.Count - packetLength);
-            packet.RemoveRange(0, 4);
-
-            return packet.ToArray();
+        public byte[] ReadMessage(SslStream sslStream) {
+            return CommunicationUtils.Receive(Logger, sslStream);
         }
     }
 }

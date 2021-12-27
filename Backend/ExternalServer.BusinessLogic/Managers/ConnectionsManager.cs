@@ -7,6 +7,8 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using ExternalServer.Common.Configuration;
+using ExternalServer.Common.Models;
+using ExternalServer.Common.Models.DTOs;
 using ExternalServer.Common.Models.Entities;
 using ExternalServer.Common.Specifications;
 using ExternalServer.Common.Specifications.DataAccess.Communication;
@@ -61,7 +63,9 @@ namespace ExternalServer.BusinessLogic.Managers {
             }
         }
 
-        public IRelayRequestResult SendUserConnectRequest(Guid basestationId) {
+        public IConnectRequestResult SendUserConnectRequest(ConnectRequest connectRequest) {
+            var basestationId = connectRequest.BasestationId;
+
             try {
                 if (_connections.ContainsKey(basestationId)) {
                     var connection = _connections[basestationId];
@@ -69,18 +73,18 @@ namespace ExternalServer.BusinessLogic.Managers {
 
                         lock (connection) { // only one client can establish a connection with the basestation at the same time
                             // notify basesation and ask if peer to peer is possible
-                            var buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new WanPackage {
-                                Package = CommunicationCodes.SendPeerToPeerEndPoint,
+                            var buffer = CommunicationUtils.SerializeObject(new WanPackage {
+                                Package = CommunicationUtils.SerializeObject<ConnectRequestDto>(connectRequest.ToDto()),
                                 PackageType = PackageType.Init
-                            }));
-                            DataAccess.Communication.SslListener.SendMessage(connection.stream, buffer);
+                            });
+                            SslListener.SendMessage(connection.stream, buffer);
 
-                            var answer = DataAccess.Communication.SslListener.ReadMessage(connection.stream);
-                            var answerO = JsonConvert.DeserializeObject<WanPackage>(Encoding.UTF8.GetString(answer));
+                            var answer = SslListener.ReadMessage(connection.stream);
+                            var answerO = CommunicationUtils.DeserializeObject<WanPackage>(answer);
 
                             if (answerO.Package?.Length > 0) {
                                 // basestation managed to open a publicly accessable port
-                                return new RelayRequestResult() {
+                                return new ConnectRequestResult() {
                                     PeerToPeerEndPoint = IPEndPoint.Parse(Encoding.UTF8.GetString(answerO.Package)),
                                     basestationStream = connection.stream
                                 };
@@ -88,7 +92,7 @@ namespace ExternalServer.BusinessLogic.Managers {
                             else {
                                 // no peer to peer possible
                                 // relay mobile app traffic over this server
-                                return new RelayRequestResult() {
+                                return new ConnectRequestResult() {
                                     basestationStream = connection.stream
                                 };
                             }
@@ -107,22 +111,22 @@ namespace ExternalServer.BusinessLogic.Managers {
                 RemoveConnection(basestationId);
             }
 
-            return new RelayRequestResult();
+            return new ConnectRequestResult();
         }
 
         public void Start(CancellationToken token) {
             int port = Convert.ToInt32(Configuration[ConfigurationVars.BASESTATIONCONNECTIONSERVICE_PORT]);
-            SslListener.Start(token, new IPEndPoint(IPAddress.Any, port), ClientConnected, keepAliveInterval: 0, receiveTimeout: 5000);
+            SslListener.Start(token, new IPEndPoint(IPAddress.Any, port), ClientConnected, keepAliveInterval: 0, receiveTimeout: 20000);
         }
 
         private void ClientConnected(SslStream stream, TcpClient client) {
             try {
                 // receive id
-                var basestationIdBytes = DataAccess.Communication.SslListener.ReadMessage(stream);
+                var basestationIdBytes = SslListener.ReadMessage(stream);
                 var basestationId = new Guid(basestationIdBytes);
 
                 // send ack
-                DataAccess.Communication.SslListener.SendMessage(stream, CommunicationCodes.ACK);
+                SslListener.SendMessage(stream, CommunicationCodes.ACK);
 
                 Logger.Info($"[ClientConnected]Accommodate bastation with id={basestationId.ToString()} to the list.");
 

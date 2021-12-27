@@ -19,5 +19,9 @@ namespace ExternalServer.Common.Specifications.DataAccess.Communication {
         /// <param name="keepAliveInterval">0 or less, to deactivate keep alive. Value in ms.</param>
         /// <param name="receiveTimeout"></param>
         void Start(CancellationToken token, IPEndPoint endPoint, SslStreamOpenCallback sslStreamOpenCallback, int keepAliveInterval, int receiveTimeout);
+
+        void SendMessage(SslStream sslStream, byte[] msg);
+
+        byte[] ReadMessage(SslStream sslStream);
     }
 }

@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExternalServer.Common.Configuration;
 using ExternalServer.Common.Models;
+using ExternalServer.Common.Models.DTOs;
 using ExternalServer.Common.Specifications;
 using ExternalServer.Common.Specifications.DataAccess.Communication;
 using ExternalServer.Common.Specifications.Managers;
@@ -41,28 +42,30 @@ namespace ExternalServer.BusinessLogic.Managers {
             _cancellationToken = cancellationToken;
             int port = Convert.ToInt32(Configuration[ConfigurationVars.MOBILEAPPRELAYSERVICE_PORT]);
             Logger.Info($"[Start]Starting RelayManager.");
-            SslListener.Start(cancellationToken, new IPEndPoint(IPAddress.Any, port), MoblieAppConnected, keepAliveInterval: 0, receiveTimeout: -1);
+            SslListener.Start(cancellationToken, new IPEndPoint(IPAddress.Any, port), MoblieAppConnected, keepAliveInterval: 0, receiveTimeout: System.Threading.Timeout.Infinite);
         }
 
         private void MoblieAppConnected(SslStream stream, TcpClient tcpClient) {
             Task.Run(() => {
-                Logger.Info($"[MoblieAppConnected]Client with IP={tcpClient.Client.RemoteEndPoint} connected.");
+                var remoteEndPoint = tcpClient.Client.RemoteEndPoint;
+                Logger.Info($"[MoblieAppConnected]Client with IP={remoteEndPoint} connected.");
 
                 try {
                     // get the Basestation Id the client want's to connect to
-                    var basestationIdBytes = DataAccess.Communication.SslListener.ReadMessage(stream);
-                    var basestationId = new Guid(basestationIdBytes);
+                    var receivedBytes = SslListener.ReadMessage(stream);
+                    var connectRequest = CommunicationUtils.DeserializeObject<ConnectRequestDto>(receivedBytes).FromDto();
+                    var basestationId = connectRequest.BasestationId;
 
                     Logger.Info($"[MoblieAppConnected]Forwarding connect request to basestation with id={basestationId}.");
 
                     // send conenction request to basestation
-                    var relayRequestResult = ConnectionsManager.SendUserConnectRequest(basestationId);
+                    var relayRequestResult = ConnectionsManager.SendUserConnectRequest(connectRequest);
 
                     // send client back IRelayRequestResult
-                    byte[] answer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(relayRequestResult.ToDto()));
-                    DataAccess.Communication.SslListener.SendMessage(stream, answer);
+                    byte[] answer = CommunicationUtils.SerializeObject(relayRequestResult.ToDto());
+                    SslListener.SendMessage(stream, answer);
 
-                    var ack = DataAccess.Communication.SslListener.ReadMessage(stream);
+                    var ack = SslListener.ReadMessage(stream);
                     if (!ack.SequenceEqual(CommunicationCodes.ACK)) {
                         return;
                     }
@@ -73,16 +76,16 @@ namespace ExternalServer.BusinessLogic.Managers {
 
                         while (true) {
                             // tunnel messages
-                            var bytes_fromClient = DataAccess.Communication.SslListener.ReadMessage(stream);
+                            var bytes_fromClient = SslListener.ReadMessage(stream);
                             Logger.Info($"[MoblieAppConnected]Tunneling {bytes_fromClient.Length} bytes to basestation.");
-                            DataAccess.Communication.SslListener.SendMessage(relayRequestResult.basestationStream, bytes_fromClient);
-                            var bytes_fromBasestation = DataAccess.Communication.SslListener.ReadMessage(relayRequestResult.basestationStream);
+                            SslListener.SendMessage(relayRequestResult.basestationStream, bytes_fromClient);
+                            var bytes_fromBasestation = SslListener.ReadMessage(relayRequestResult.basestationStream);
                             Logger.Info($"[MobileAppConnected]Tunneling {bytes_fromBasestation.Length} bytes to client.");
-                            DataAccess.Communication.SslListener.SendMessage(stream, bytes_fromBasestation);
+                            SslListener.SendMessage(stream, bytes_fromBasestation);
                         }
                     }
                     else if (relayRequestResult.basestationStream != null && relayRequestResult.PeerToPeerEndPoint != null) {
-                        Logger.Info($"[MoblieAppConnected]Sent {tcpClient.Client.RemoteEndPoint} a peer to peer endpoint from {basestationId}.");
+                        Logger.Info($"[MoblieAppConnected]Sent to {tcpClient.Client.RemoteEndPoint} a peer to peer endpoint from {basestationId}.");
                     }
                     else {
                         // basestation is not connected to the server
@@ -90,7 +93,7 @@ namespace ExternalServer.BusinessLogic.Managers {
                     }
                 }
                 catch (Exception ex) {
-                    Logger.Error(ex, $"[MobileAppConnected]An error occured.");
+                    Logger.Trace(ex, $"[MobileAppConnected]An error occured (ep={remoteEndPoint}).");
                 }
             }, _cancellationToken).ContinueWith(task => {
                 // closes also the underlying stream

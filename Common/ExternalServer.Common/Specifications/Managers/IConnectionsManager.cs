@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using ExternalServer.Common.Models.Entities;
 using ExternalServer.Common.Specifications.DataObjects;
 
 namespace ExternalServer.Common.Specifications.Managers {
@@ -15,9 +16,9 @@ namespace ExternalServer.Common.Specifications.Managers {
         /// The basestation will try to open a public port via STUN.
         /// If that fails, all traffic will be relayed threw this server.
         /// </summary>
-        /// <param name="basestationId"></param>
+        /// <param name="connectRequest"></param>
         /// <returns>Containes if the baseastion was reachable and the Endpoint of the basestation if peer to peer is possible.</returns>
-        IRelayRequestResult SendUserConnectRequest(Guid basestationId);
+        IConnectRequestResult SendUserConnectRequest(ConnectRequest connectRequest);
 
         /// <summary>
         /// Removes closed connections from the list.

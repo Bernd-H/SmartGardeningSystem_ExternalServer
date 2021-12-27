@@ -1,10 +1,10 @@
 ﻿using System.Net;
 
 namespace ExternalServer.Common.Specifications.DataObjects.Dto {
-    public interface IRelayRequestResultDto {
+    public interface IConnectRequestResultDto {
 
         bool BasestationNotReachable { get; set; }
 
-        IPEndPoint BasestaionEndPoint { get; set; }
+        string BasestaionEndPoint { get; set; }
     }
 }

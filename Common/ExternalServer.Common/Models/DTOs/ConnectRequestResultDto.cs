@@ -2,10 +2,10 @@
 using ExternalServer.Common.Specifications.DataObjects.Dto;
 
 namespace ExternalServer.Common.Models.DTOs {
-    public class RelayRequestResultDto : IRelayRequestResultDto {
+    public class ConnectRequestResultDto : IConnectRequestResultDto {
 
         public bool BasestationNotReachable { get; set; }
 
-        public IPEndPoint BasestaionEndPoint { get; set; }
+        public string BasestaionEndPoint { get; set; }
     }
 }

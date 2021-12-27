@@ -2,7 +2,7 @@
 using System.Net.Security;
 
 namespace ExternalServer.Common.Specifications.DataObjects {
-    public interface IRelayRequestResult {
+    public interface IConnectRequestResult {
 
         /// <summary>
         /// Public endpoint of the basestation.
