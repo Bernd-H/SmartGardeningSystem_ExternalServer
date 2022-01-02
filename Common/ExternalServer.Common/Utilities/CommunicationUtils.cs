@@ -62,10 +62,10 @@ namespace ExternalServer.Common.Utilities {
                 while (true) {
                     readBytes = networkStream.Read(buffer, 0, buffer.Length);
 
-                    if (readBytes == 0) {
-                        //throw new ConnectionClosedException(networkStreamId);
-                        throw new Exception();
-                    }
+                    //if (readBytes == 0) {
+                    //    //throw new ConnectionClosedException(networkStreamId);
+                    //    throw new Exception();
+                    //}
                     if (readBytes < buffer.Length) {
                         var tmp = new List<byte>(buffer);
                         packet.AddRange(tmp.GetRange(0, readBytes));
@@ -80,6 +80,7 @@ namespace ExternalServer.Common.Utilities {
             }
             catch (ObjectDisposedException) {
                 //throw new ConnectionClosedException(networkStreamId);
+                throw;
             }
 
             return new byte[0];

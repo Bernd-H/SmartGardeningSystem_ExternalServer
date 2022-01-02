@@ -15,7 +15,7 @@ using NLog;
 namespace ExternalServer.DataAccess.Communication {
     public class SslListener : ISslListener {
 
-        private static ManualResetEvent tcpClientConnected = new ManualResetEvent(false);
+        private ManualResetEvent tcpClientConnected = new ManualResetEvent(false);
 
         private TcpListener _tcpListener;
 

@@ -19,6 +19,7 @@
         // Client Relay
         public static string MOBILEAPPRELAYSERVICE_PORT = "mobileAppRelayService_port";
         public static string BASESTATIONCONNECTIONSERVICE_PORT = "basetationConnectionService_port";
+        public static string BASESTATIONRELAYTUNNEL_PORT = "basestationRelayTunnel_port";
 
         // Test Environment
         public static string IS_TEST_ENVIRONMENT = "isTestEnvironment";

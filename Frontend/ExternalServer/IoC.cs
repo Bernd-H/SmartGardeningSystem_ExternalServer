@@ -53,6 +53,7 @@ namespace ExternalServer {
             containerBuilder.RegisterType<SettingsManager>().As<ISettingsManager>();
             containerBuilder.RegisterType<CertificateManager>().As<ICertificateManager>();
             containerBuilder.RegisterType<ConnectionsManager>().As<IConnectionsManager>().SingleInstance();
+            containerBuilder.RegisterType<RelayInitManager>().As<IRelayInitManager>().SingleInstance();
             containerBuilder.RegisterType<RelayManager>().As<IRelayManager>().SingleInstance();
 
             // cryptography

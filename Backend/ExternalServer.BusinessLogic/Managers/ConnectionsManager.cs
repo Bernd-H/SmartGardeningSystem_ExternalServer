@@ -82,17 +82,18 @@ namespace ExternalServer.BusinessLogic.Managers {
                             var answer = SslListener.ReadMessage(connection.stream);
                             var answerO = CommunicationUtils.DeserializeObject<WanPackage>(answer);
 
-                            if (answerO.Package?.Length > 0) {
+                            if (answerO.PackageType == PackageType.PeerToPeerInit) {
                                 // basestation managed to open a publicly accessable port
                                 return new ConnectRequestResult() {
                                     PeerToPeerEndPoint = IPEndPoint.Parse(Encoding.UTF8.GetString(answerO.Package)),
                                     basestationStream = connection.stream
                                 };
                             }
-                            else {
+                            else if (answerO.PackageType == PackageType.ExternalServerRelayInit) {
                                 // no peer to peer possible
                                 // relay mobile app traffic over this server
                                 return new ConnectRequestResult() {
+                                    TunnelId = new Guid(answerO.Package),
                                     basestationStream = connection.stream
                                 };
                             }
@@ -100,7 +101,8 @@ namespace ExternalServer.BusinessLogic.Managers {
                     }
                     else {
                         // remove client form list
-                        RemoveConnection(basestationId);
+                        Logger.Info($"[SendUserConnectRequest]Removing basestation because it didn't respond to poll.");
+                        //RemoveConnection(basestationId); // should i really do that?
                     }
                 }
             }
@@ -108,7 +110,7 @@ namespace ExternalServer.BusinessLogic.Managers {
             catch (ObjectDisposedException) { }
             catch (Exception ex) {
                 Logger.Error(ex, $"[SendUserConnectRequest]Failed. Removing connection from list.");
-                RemoveConnection(basestationId);
+                //RemoveConnection(basestationId); // should i really do that?
             }
 
             return new ConnectRequestResult();

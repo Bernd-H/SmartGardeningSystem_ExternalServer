@@ -16,16 +16,20 @@ namespace ExternalServer.Jobs {
 
         private IConnectionsManager ConnectionsManager;
 
+        private IRelayInitManager RelayInitManager;
+
         private IRelayManager RelayManager;
 
         private IConfiguration Configuration;
 
         private ILogger Logger;
 
-        public ConnectorJob(ILoggerService loggerService, IConnectionsManager connectionsManager, IConfiguration configuration, IRelayManager relayManager) {
+        public ConnectorJob(ILoggerService loggerService, IConnectionsManager connectionsManager, IConfiguration configuration, IRelayInitManager relayInitManager,
+            IRelayManager relayManager) {
             Logger = loggerService.GetLogger<ConnectorJob>();
             ConnectionsManager = connectionsManager;
             Configuration = configuration;
+            RelayInitManager = relayInitManager;
             RelayManager = relayManager;
         }
 
@@ -33,6 +37,7 @@ namespace ExternalServer.Jobs {
             Logger.Info($"[StartAsync]Starting ConnectionsManager.");
 
             ConnectionsManager.Start(_cancellationTokenSource.Token);
+            RelayInitManager.Start(_cancellationTokenSource.Token);
             RelayManager.Start(_cancellationTokenSource.Token);
 
             Task.Run(async () => {

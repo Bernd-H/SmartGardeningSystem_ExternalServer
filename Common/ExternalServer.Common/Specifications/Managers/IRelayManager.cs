@@ -1,13 +1,16 @@
-﻿using System.Net;
+﻿using System;
+using System.Net.Security;
 using System.Threading;
 
 namespace ExternalServer.Common.Specifications.Managers {
 
     /// <summary>
-    /// Starts accepting relay requests from mobile apps
+    /// Administrates relay connections to basestations.
     /// </summary>
     public interface IRelayManager {
 
         void Start(CancellationToken cancellationToken);
+
+        SslStream GetTunnelToBasestation(Guid tunnelId);
     }
 }
