@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using ExternalServer.Common.Configuration;
+using ExternalServer.Common.Exceptions;
 using ExternalServer.Common.Models;
 using ExternalServer.Common.Models.DTOs;
 using ExternalServer.Common.Specifications;
@@ -54,12 +55,13 @@ namespace ExternalServer.BusinessLogic.Managers {
                 var remoteEndPoint = tcpClient.Client.RemoteEndPoint;
                 Logger.Info($"[MoblieAppConnected]Client with IP={remoteEndPoint} connected.");
                 SslStream tunnelStream = null;
+                Guid basestationId = Guid.Empty;
 
                 try {
                     // get the Basestation Id the client want's to connect to
                     var receivedBytes = SslListener.ReadMessage(stream);
                     var connectRequest = CommunicationUtils.DeserializeObject<ConnectRequestDto>(receivedBytes).FromDto();
-                    var basestationId = connectRequest.BasestationId;
+                    basestationId = connectRequest.BasestationId;
 
                     Logger.Info($"[MoblieAppConnected]Forwarding connect request to basestation with id={basestationId}.");
 
@@ -105,6 +107,9 @@ namespace ExternalServer.BusinessLogic.Managers {
                         // basestation is not connected to the server
                         // connection will get closed at the end
                     }
+                }
+                catch (ConnectionClosedException) {
+                    Logger.Info($"[MobileAppConnected]Mobile app (ep={remoteEndPoint}) or basestation (id={basestationId}) closed the connection.");
                 }
                 catch (Exception ex) {
                     Logger.Trace(ex, $"[MobileAppConnected]An error occured (ep={remoteEndPoint}).");

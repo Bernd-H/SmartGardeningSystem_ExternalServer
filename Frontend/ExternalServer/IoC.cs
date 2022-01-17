@@ -63,6 +63,7 @@ namespace ExternalServer {
             // repositories
             containerBuilder.RegisterType<CertificateRepository>().As<ICertificateRepository>().SingleInstance();
             containerBuilder.RegisterType<UserRepository>().As<IUserRepository>().SingleInstance();
+            containerBuilder.RegisterType<WeatherRepository>().As<IWeatherRepository>().SingleInstance();
 
             // communication
             containerBuilder.RegisterType<SslListener>().As<ISslListener>();

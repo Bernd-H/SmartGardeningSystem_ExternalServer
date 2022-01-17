@@ -23,10 +23,10 @@ namespace ExternalServer {
                 var cert = IoC.Get<ICertificateManager>().GetCertificate();
 
                 // development setup
-                if (Convert.ToBoolean(ConfigurationContainer.Configuration[ConfigurationVars.IS_TEST_ENVIRONMENT])) {
-                    logger.Info("Setting up test development/test enviroment.");
-                    //IoC.Get<IDevelopmentSetuper>().SetupTestEnvironment();
-                }
+                //if (Convert.ToBoolean(ConfigurationContainer.Configuration[ConfigurationVars.IS_TEST_ENVIRONMENT])) {
+                //    logger.Info("Setting up test development/test enviroment.");
+                //    IoC.Get<IDevelopmentSetuper>().SetupTestEnvironment();
+                //}
 
                 CreateHostBuilder(args, logger, cert).Build().Run();
             }
@@ -39,6 +39,10 @@ namespace ExternalServer {
                 // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
                 NLog.LogManager.Shutdown();
             }
+
+            // An unknown thread blocks the application when it's finished.
+            // All own processes should shut down cleanly after the cancel key (Strg + C) gets pressed.
+            Environment.Exit(0);
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args, NLog.ILogger logger, X509Certificate2 x509Certificate) =>
@@ -75,15 +79,11 @@ namespace ExternalServer {
                     });
                 })
                 .ConfigureServices((hostContext, services) => {
-                    //// timed jobs
-                    //if (Convert.ToBoolean(ConfigurationContainer.Configuration[ConfigurationVars.WATERINGJOB_ENABLED]))
-                    //{
-                    //    services.AddHostedService<WateringJob>();
-                    //}
-                    // other services
+                    // services
                     if (Convert.ToBoolean(ConfigurationContainer.Configuration[ConfigurationVars.CONNECTORJOB_ENABLED])) {
                         services.AddHostedService<ConnectorJob>();
                     }
-                });
+                })
+                .UseConsoleLifetime();
     }
 }

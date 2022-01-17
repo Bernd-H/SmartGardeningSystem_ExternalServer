@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ExternalServer.Common.Exceptions;
 using Newtonsoft.Json;
 using NLog;
 
@@ -23,8 +24,7 @@ namespace ExternalServer.Common.Utilities {
                     readBytes = await networkStream.ReadAsync(buffer, 0, buffer.Length, cancellationToken);
 
                     if (readBytes == 0) {
-                        //throw new ConnectionClosedException(networkStreamId);
-                        throw new Exception();
+                        throw new ConnectionClosedException();
                     }
                     if (readBytes < buffer.Length) {
                         var tmp = new List<byte>(buffer);
@@ -39,10 +39,8 @@ namespace ExternalServer.Common.Utilities {
                 return packet.ToArray();
             }
             catch (ObjectDisposedException) {
-                //throw new ConnectionClosedException(networkStreamId);
+                throw new ConnectionClosedException();
             }
-
-            return new byte[0];
         }
 
         public static async Task SendAsync(ILogger logger, byte[] msg, Stream networkStream, CancellationToken cancellationToken = default) {
@@ -62,10 +60,9 @@ namespace ExternalServer.Common.Utilities {
                 while (true) {
                     readBytes = networkStream.Read(buffer, 0, buffer.Length);
 
-                    //if (readBytes == 0) {
-                    //    //throw new ConnectionClosedException(networkStreamId);
-                    //    throw new Exception();
-                    //}
+                    if (readBytes == 0) {
+                        throw new ConnectionClosedException();
+                    }
                     if (readBytes < buffer.Length) {
                         var tmp = new List<byte>(buffer);
                         packet.AddRange(tmp.GetRange(0, readBytes));
@@ -79,11 +76,8 @@ namespace ExternalServer.Common.Utilities {
                 return packet.ToArray();
             }
             catch (ObjectDisposedException) {
-                //throw new ConnectionClosedException(networkStreamId);
-                throw;
+                throw new ConnectionClosedException();
             }
-
-            return new byte[0];
         }
 
         public static void Send(ILogger logger, byte[] msg, Stream networkStream) {
