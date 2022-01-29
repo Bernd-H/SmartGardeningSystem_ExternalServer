@@ -6,6 +6,8 @@ using ExternalServer.Common.Specifications.Cryptography;
 using NLog;
 
 namespace ExternalServer.BusinessLogic.Cryptography {
+
+    /// <inheritdoc/>
     public sealed class PasswordHasher : IPasswordHasher {
         private const int SaltSize = 16; // 128 bit 
         private const int KeySize = 32; // 256 bit
@@ -16,6 +18,7 @@ namespace ExternalServer.BusinessLogic.Cryptography {
             Logger = loggerService.GetLogger<PasswordHasher>();
         }
 
+        /// <inheritdoc/>
         public bool VerifyHashedPassword(Guid userId, string hashedPassword, byte[] providedPassword) {
             try {
                 var parts = hashedPassword.Split('.', 3);

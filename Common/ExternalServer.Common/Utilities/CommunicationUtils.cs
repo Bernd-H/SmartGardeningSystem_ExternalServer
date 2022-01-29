@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,6 +38,19 @@ namespace ExternalServer.Common.Utilities {
                 }
 
                 return packet.ToArray();
+            }
+            catch (IOException ioex) {
+                if (ioex.InnerException != null) {
+                    if (ioex.InnerException.GetType() == typeof(SocketException)) {
+                        var socketE = (SocketException)ioex.InnerException;
+                        if (socketE.SocketErrorCode == SocketError.ConnectionReset) {
+                            // peer closed the connection
+                            throw new ConnectionClosedException();
+                        }
+                    }
+                }
+
+                throw;
             }
             catch (ObjectDisposedException) {
                 throw new ConnectionClosedException();

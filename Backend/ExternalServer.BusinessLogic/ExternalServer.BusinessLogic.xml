@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ExternalServer.BusinessLogic</name>
+    </assembly>
+    <members>
+        <member name="T:ExternalServer.BusinessLogic.Cryptography.PasswordHasher">
+            <inheritdoc/>
+        </member>
+        <member name="M:ExternalServer.BusinessLogic.Cryptography.PasswordHasher.VerifyHashedPassword(System.Guid,System.String,System.Byte[])">
+            <inheritdoc/>
+        </member>
+    </members>
+</doc>

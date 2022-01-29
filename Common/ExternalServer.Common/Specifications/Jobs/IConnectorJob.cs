@@ -1,7 +1,8 @@
 ﻿namespace ExternalServer.Common.Specifications.Jobs {
 
     /// <summary>
-    /// Job to connect mobile apps over the internet to specific basestations
+    /// Starts and stops all services that have something to do with connecting mobile apps to a basestation
+    /// or relaying packages.
     /// </summary>
     public interface IConnectorJob {
 

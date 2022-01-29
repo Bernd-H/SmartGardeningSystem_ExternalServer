@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using ExternalServer.Common.Configuration;
+using ExternalServer.Common.Events.Communication;
 using ExternalServer.Common.Models;
 using ExternalServer.Common.Models.DTOs;
 using ExternalServer.Common.Models.Entities;
@@ -102,12 +103,16 @@ namespace ExternalServer.BusinessLogic.Managers {
                     else {
                         // remove client form list
                         Logger.Info($"[SendUserConnectRequest]Removing basestation because it didn't respond to poll.");
-                        //RemoveConnection(basestationId); // should i really do that?
+                        RemoveConnection(basestationId); // should i really do that?
                     }
                 }
             }
-            catch (SocketException) { }
-            catch (ObjectDisposedException) { }
+            catch (SocketException sex) {
+                Logger.Error(sex, $"[SendUserConnectRequest]A socket exception occured.");
+            }
+            catch (ObjectDisposedException odex) {
+                Logger.Error(odex, $"[SendUserConnectRequest]{odex.ObjectName} disposed.");
+            }
             catch (Exception ex) {
                 Logger.Error(ex, $"[SendUserConnectRequest]Failed. Removing connection from list.");
                 //RemoveConnection(basestationId); // should i really do that?
@@ -118,10 +123,15 @@ namespace ExternalServer.BusinessLogic.Managers {
 
         public void Start(CancellationToken token) {
             int port = Convert.ToInt32(Configuration[ConfigurationVars.BASESTATIONCONNECTIONSERVICE_PORT]);
-            SslListener.Start(token, new IPEndPoint(IPAddress.Any, port), ClientConnected, keepAliveInterval: 0, receiveTimeout: 20000);
+            SslListener.ClientConnectedEventHandler += ClientConnected;
+            SslListener.Start(token, new IPEndPoint(IPAddress.Any, port), keepAliveInterval: 60, receiveTimeout: 20000);
+            //SslListener.Start(token, new IPEndPoint(IPAddress.Any, port), ClientConnected, keepAliveInterval: 60, receiveTimeout: 20000);
         }
 
-        private void ClientConnected(SslStream stream, TcpClient client) {
+        private void ClientConnected(object o, ClientConnectedEventArgs args) {
+            SslStream stream = (SslStream)args.Stream;
+            TcpClient client = args.TcpClient;
+
             try {
                 // receive id
                 var basestationIdBytes = SslListener.ReadMessage(stream);

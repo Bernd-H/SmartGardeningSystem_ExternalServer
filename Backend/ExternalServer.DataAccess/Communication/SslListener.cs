@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Security.Authentication;
 using System.Threading;
+using ExternalServer.Common.Events.Communication;
 using ExternalServer.Common.Specifications;
 using ExternalServer.Common.Specifications.DataAccess.Communication;
 using ExternalServer.Common.Specifications.Managers;
@@ -13,19 +14,24 @@ using ExternalServer.Common.Utilities;
 using NLog;
 
 namespace ExternalServer.DataAccess.Communication {
+
+    /// <inheritdoc/>
     public class SslListener : ISslListener {
 
-        private ManualResetEvent tcpClientConnected = new ManualResetEvent(false);
+        /// <inheritdoc/>
+
+        public event EventHandler<ClientConnectedEventArgs> ClientConnectedEventHandler;
+
 
         private TcpListener _tcpListener;
 
         private Thread _workingThread;
 
-        private SslStreamOpenCallback _sslStreamOpenCallback;
-
         private int _keepAliveInterval;
 
         private int _receiveTimeout;
+
+        private CancellationToken _cancellationToken;
 
 
         private ICertificateManager CertificateManager;
@@ -37,8 +43,112 @@ namespace ExternalServer.DataAccess.Communication {
             CertificateManager = certificateManager;
         }
 
-        public void Start(CancellationToken token, IPEndPoint endPoint, SslStreamOpenCallback sslStreamOpenCallback, int keepAliveInterval, int receiveTimeout) {
-            _sslStreamOpenCallback = sslStreamOpenCallback;
+        /// <inheritdoc/>
+        public void Start(CancellationToken token, IPEndPoint endPoint, int keepAliveInterval, int receiveTimeout) {
+            _keepAliveInterval = keepAliveInterval;
+            _receiveTimeout = receiveTimeout;
+            _cancellationToken = token;
+
+            _workingThread = new Thread(() => {
+                _tcpListener = new TcpListener(endPoint);
+                _tcpListener.Server.ReceiveTimeout = receiveTimeout;
+                _tcpListener.Server.SendTimeout = 5000;
+
+                _tcpListener.Start();
+                token.Register(() => _tcpListener.Stop());
+
+                Logger.Info($"[Start]Listening on {_tcpListener.LocalEndpoint}...");
+
+                try {
+                    while (!token.IsCancellationRequested) {
+                        //Logger.Info($"[Start]Waiting to accept a tcp client on thread: {System.Threading.Thread.CurrentThread.ManagedThreadId}.");
+                        var client = _tcpListener.AcceptTcpClient();
+
+                        HandleNewClient(client);
+                    }
+                }catch (SocketException) {
+                    // _tcpListener gets stopped
+                    Logger.Info($"[Start]Stopped accepting new tcp clients.");
+                    return;
+                }
+            });
+
+            _workingThread.Start();
+        }
+
+        private void HandleNewClient(TcpClient client) {
+            // handle this client with a thread from the thread pool
+            ThreadPool.QueueUserWorkItem(state => {
+                SslStream sslStream = null;
+
+                try {
+                    //var remotePort = ((IPEndPoint)client.Client.RemoteEndPoint).Port;
+                    //Logger.Info($"[Start]Thread Id while establishing the ssl stream for client with remote port {remotePort}" +
+                    //    $" = {System.Threading.Thread.CurrentThread.ManagedThreadId}");
+
+                    client.Client.Blocking = true;
+                    ConfigureKeepAlive(client);
+
+                    // open ssl stream
+                    sslStream = new SslStream(client.GetStream(), false);
+
+                    // Set timeouts for the read and write to 1 second.
+                    sslStream.ReadTimeout = _receiveTimeout;
+                    sslStream.WriteTimeout = 5000;
+
+                    sslStream.AuthenticateAsServer(CertificateManager.GetCertificate(), clientCertificateRequired: false, checkCertificateRevocation: true);
+
+                    // communicate
+                    ClientConnectedEventHandler?.Invoke(null, new ClientConnectedEventArgs(client, sslStream));
+                }
+                catch (AuthenticationException e) {
+                    Logger.Error(e, "[AcceptTcpClientCallback]Authentication failed - closing the connection.");
+                    sslStream?.Close();
+                }
+                catch (ObjectDisposedException odex) {
+                    Logger.Trace($"[AcceptTcpClientCallback]Connection from {client?.Client.RemoteEndPoint} got unexpectedly closed.");
+                    sslStream?.Close();
+                }
+                catch (Exception ex) {
+                    Logger.Trace(ex, "[AcceptTcpClientCallback]An excpetion occured.");
+                    sslStream?.Close();
+                }
+                finally {
+                    // ssl Stream will get close in the callback
+                }
+            });
+        }
+
+        private void ConfigureKeepAlive(TcpClient client) {
+            if (_keepAliveInterval > 0) {
+                Logger.Info($"[ConfigureKeepAlive]Settings keep alive interval to {_keepAliveInterval}s for connection with endpoint {client.Client.RemoteEndPoint}.");
+
+                client.Client.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveTime, _keepAliveInterval);
+                client.Client.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveInterval, 5);
+                client.Client.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveRetryCount, 2);
+                //client.Client.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.KeepAlive, true);
+                client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+            }
+        }
+
+        /// <inheritdoc/>
+        public void SendMessage(SslStream sslStream, byte[] msg) {
+            // use the async method to be able to cancel the send process
+            CommunicationUtils.SendAsync(Logger, msg, sslStream, _cancellationToken).Wait();
+        }
+
+        /// <inheritdoc/>
+        public byte[] ReadMessage(SslStream sslStream) {
+            // use the async method to be able to cancellate the receive process
+            return CommunicationUtils.ReceiveAsync(Logger, sslStream, _cancellationToken).Result;
+        }
+
+        #region old BeginAccept methods and ConfigureKeepAlive
+
+        private ManualResetEvent tcpClientConnected = new ManualResetEvent(false);
+
+        public void Start_old(CancellationToken token, IPEndPoint endPoint, int keepAliveInterval, int receiveTimeout) {
+            //_sslStreamOpenCallback = sslStreamOpenCallback;
             _keepAliveInterval = keepAliveInterval;
             _receiveTimeout = receiveTimeout;
 
@@ -52,7 +162,7 @@ namespace ExternalServer.DataAccess.Communication {
 
                 Logger.Info($"[Start]Listening on {_tcpListener.LocalEndpoint}...");
 
-                while (true) {
+                while (!token.IsCancellationRequested) {
                     tcpClientConnected.Reset();
 
                     _tcpListener.BeginAcceptTcpClient(BeginAcceptClient, token);
@@ -68,6 +178,7 @@ namespace ExternalServer.DataAccess.Communication {
             SslStream sslStream = null;
             TcpClient client = null;
             CancellationToken token = (CancellationToken)ar.AsyncState;
+            bool mainThreadBlockReleased = false;
 
             try {
                 if (token.IsCancellationRequested)
@@ -78,7 +189,10 @@ namespace ExternalServer.DataAccess.Communication {
                 client.Client.Blocking = true;
                 ConfigureKeepAlive(client);
 
+                Logger.Info($"[BeginAcceptClient]ThreadId: {System.Threading.Thread.CurrentThread.ManagedThreadId}.");
+
                 tcpClientConnected.Set();
+                mainThreadBlockReleased = true;
 
                 // open ssl stream
                 sslStream = new SslStream(client.GetStream(), false);
@@ -90,7 +204,8 @@ namespace ExternalServer.DataAccess.Communication {
                 sslStream.AuthenticateAsServer(CertificateManager.GetCertificate(), clientCertificateRequired: false, checkCertificateRevocation: true);
 
                 // communicate
-                _sslStreamOpenCallback.Invoke(sslStream, client);
+                //_sslStreamOpenCallback.Invoke(sslStream, client);
+                ClientConnectedEventHandler?.Invoke(null, new ClientConnectedEventArgs(client, sslStream));
             }
             catch (AuthenticationException e) {
                 Logger.Error(e, "[AcceptTcpClientCallback]Authentication failed - closing the connection.");
@@ -107,10 +222,19 @@ namespace ExternalServer.DataAccess.Communication {
             finally {
                 // ssl Stream will get close in the callback
                 // sslStream?.Close();
+
+                if (!mainThreadBlockReleased) {
+                    tcpClientConnected.Set();
+                }
             }
         }
 
-        private void ConfigureKeepAlive(TcpClient client) {
+        /// <summary>
+        /// Does not work on linux!
+        /// </summary>
+        /// <param name="client"></param>
+        [Obsolete]
+        private void ConfigureKeepAlive_old(TcpClient client) {
             if (_keepAliveInterval > 0) {
                 Logger.Info($"[ConfigureKeepAlive]Settings keep alive interval to {_keepAliveInterval}ms for connection with endpoint {client.Client.RemoteEndPoint}.");
 
@@ -133,12 +257,6 @@ namespace ExternalServer.DataAccess.Communication {
             }
         }
 
-        public void SendMessage(SslStream sslStream, byte[] msg) {
-            CommunicationUtils.Send(Logger, msg, sslStream);
-        }
-
-        public byte[] ReadMessage(SslStream sslStream) {
-            return CommunicationUtils.Receive(Logger, sslStream);
-        }
+        #endregion
     }
 }

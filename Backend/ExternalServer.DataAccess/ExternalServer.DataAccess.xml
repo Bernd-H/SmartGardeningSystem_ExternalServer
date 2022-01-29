@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ExternalServer.DataAccess</name>
+    </assembly>
+    <members>
+        <member name="T:ExternalServer.DataAccess.Communication.SslListener">
+            <inheritdoc/>
+        </member>
+        <member name="E:ExternalServer.DataAccess.Communication.SslListener.ClientConnectedEventHandler">
+            <inheritdoc/>
+        </member>
+        <member name="M:ExternalServer.DataAccess.Communication.SslListener.Start(System.Threading.CancellationToken,System.Net.IPEndPoint,System.Int32,System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ExternalServer.DataAccess.Communication.SslListener.SendMessage(System.Net.Security.SslStream,System.Byte[])">
+            <inheritdoc/>
+        </member>
+        <member name="M:ExternalServer.DataAccess.Communication.SslListener.ReadMessage(System.Net.Security.SslStream)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ExternalServer.DataAccess.Communication.SslListener.ConfigureKeepAlive_old(System.Net.Sockets.TcpClient)">
+            <summary>
+            Does not work on linux!
+            </summary>
+            <param name="client"></param>
+        </member>
+        <member name="T:ExternalServer.DataAccess.Repositories.CertificateRepository">
+            <inheritdoc/>
+        </member>
+        <member name="M:ExternalServer.DataAccess.Repositories.CertificateRepository.GetCertificate(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ExternalServer.DataAccess.Repositories.CertificateRepository.getCertificate(System.String)">
+            <summary>
+            Gets certificate with specified certThumbprint from the specified StoreLocation
+            </summary>
+        </member>
+        <member name="T:ExternalServer.DataAccess.Repositories.UserRepository">
+            <inheritdoc/>
+        </member>
+        <member name="M:ExternalServer.DataAccess.Repositories.UserRepository.AddUser(ExternalServer.Common.Models.Entities.User)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ExternalServer.DataAccess.Repositories.UserRepository.RemoveUser(ExternalServer.Common.Models.Entities.User)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ExternalServer.DataAccess.Repositories.UserRepository.UpdateUser(ExternalServer.Common.Models.Entities.User)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ExternalServer.DataAccess.Repositories.UserRepository.QueryByEmail(System.Byte[])">
+            <inheritdoc/>
+        </member>
+        <member name="M:ExternalServer.DataAccess.Repositories.UserRepository.QueryById(System.Guid)">
+            <inheritdoc/>
+        </member>
+        <member name="T:ExternalServer.DataAccess.Repositories.WeatherRepository">
+            <inheritdoc/>
+        </member>
+        <member name="M:ExternalServer.DataAccess.Repositories.WeatherRepository.GetCurrentWeatherPredictions(System.String)">
+            <inheritdoc/>
+        </member>
+    </members>
+</doc>

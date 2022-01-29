@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Threading;
 using ExternalServer.Common.Configuration;
+using ExternalServer.Common.Events.Communication;
 using ExternalServer.Common.Specifications;
 using ExternalServer.Common.Specifications.DataAccess.Communication;
 using ExternalServer.Common.Specifications.Managers;
@@ -15,7 +17,7 @@ using NLog;
 namespace ExternalServer.BusinessLogic.Managers {
     public class RelayManager : IRelayManager {
 
-        private Dictionary<Guid, SslStream> openTunnels = new Dictionary<Guid, SslStream>();
+        private ConcurrentDictionary<Guid, SslStream> openTunnels = new ConcurrentDictionary<Guid, SslStream>();
 
 
         private ISslListener SslListener;
@@ -34,18 +36,19 @@ namespace ExternalServer.BusinessLogic.Managers {
             cancellationToken.Register(() => Stop());
             int port = Convert.ToInt32(Configuration[ConfigurationVars.BASESTATIONRELAYTUNNEL_PORT]);
             Logger.Info($"[Start]Starting RelayManager.");
-            SslListener.Start(cancellationToken, new IPEndPoint(IPAddress.Any, port), BasestationConnected, keepAliveInterval: 0, receiveTimeout: System.Threading.Timeout.Infinite);
+            SslListener.ClientConnectedEventHandler += BasestationConnected;
+            SslListener.Start(cancellationToken, new IPEndPoint(IPAddress.Any, port), keepAliveInterval: 0, receiveTimeout: System.Threading.Timeout.Infinite);
+            //SslListener.Start(cancellationToken, new IPEndPoint(IPAddress.Any, port), BasestationConnected, keepAliveInterval: 0, receiveTimeout: System.Threading.Timeout.Infinite);
         }
 
         public SslStream GetTunnelToBasestation(Guid tunnelId) {
-            if (openTunnels.ContainsKey(tunnelId)) {
-                return openTunnels[tunnelId];
-            }
-
-            return null;
+            return openTunnels.GetValueOrDefault(tunnelId, defaultValue: null);
         }
 
-        private void BasestationConnected(SslStream stream, TcpClient tcpClient) {
+        private void BasestationConnected(object o, ClientConnectedEventArgs args) {
+            SslStream stream = (SslStream)args.Stream;
+            TcpClient tcpClient = args.TcpClient;
+
             var remoteEndPoint = tcpClient.Client.RemoteEndPoint;
             Logger.Info($"[BasestationConnected]Basestation with IP={remoteEndPoint} connected.");
 
@@ -56,9 +59,12 @@ namespace ExternalServer.BusinessLogic.Managers {
 
                 Logger.Info($"[BasestationConnected]Accommodating tunnel with id={tunnelId} to the list.");
 
-                lock (openTunnels) {
-                    openTunnels.Add(tunnelId, stream);
-                }
+                openTunnels.AddOrUpdate(tunnelId, stream, (id, existingStream) => {
+                    // replace the existing stream with the new stream
+                    // this should new happen...
+                    existingStream?.Close();
+                    return stream;
+                });
 
                 // send back ack
                 SslListener.SendMessage(stream, CommunicationCodes.ACK);
@@ -69,13 +75,11 @@ namespace ExternalServer.BusinessLogic.Managers {
         }
 
         private void Stop() {
-            lock (openTunnels) {
-                foreach (var connection in openTunnels) {
-                    connection.Value?.Close();
-                }
-
-                openTunnels.Clear();
+            foreach (var connection in openTunnels.Values) {
+                connection?.Close();
             }
+
+            openTunnels.Clear();
         }
     }
 }

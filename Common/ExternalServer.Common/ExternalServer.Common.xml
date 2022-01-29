@@ -1,0 +1,273 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ExternalServer.Common</name>
+    </assembly>
+    <members>
+        <member name="T:ExternalServer.Common.Configuration.ConfigurationContainer">
+            <summary>
+            Used to pass the settings file from GardeningSystem.Program.cs to StartupRestAPI.cs
+            </summary>
+        </member>
+        <member name="F:ExternalServer.Common.Configuration.ConfigurationVars.CONNECTORJOB_CLEANUPINTERVAL_H">
+            <summary>
+            Delete closed connections interval in hours.
+            </summary>
+        </member>
+        <member name="P:ExternalServer.Common.Models.DTOs.IPStatusDto.Id">
+            <summary>
+            Basestation ID
+            </summary>
+        </member>
+        <member name="P:ExternalServer.Common.Models.DTOs.IPStatusDto.Ip">
+            <summary>
+            Public IP addres of basestation
+            </summary>
+        </member>
+        <member name="P:ExternalServer.Common.Models.Entities.BasestationIP.Id">
+            <summary>
+            Basestation IP
+            </summary>
+        </member>
+        <member name="P:ExternalServer.Common.Models.Entities.BasestationIP.Ip">
+            <summary>
+            Public IP of basestation
+            </summary>
+        </member>
+        <member name="P:ExternalServer.Common.Models.Entities.User.HashedPassword">
+            <summary>
+            Max size = 100 characters
+            A Hash size of 64 bytes + a salt of 16 bytes and a iteration integer
+            with 5 digits would need 85 characters to store.
+            </summary>
+        </member>
+        <member name="T:ExternalServer.Common.Specifications.Cryptography.IPasswordHasher">
+            <summary>
+            Class to hash and verify passwords.
+            </summary>
+        </member>
+        <member name="M:ExternalServer.Common.Specifications.Cryptography.IPasswordHasher.VerifyHashedPassword(System.Guid,System.String,System.Byte[])">
+            <summary>
+            Verifies if both passwords are the same
+            </summary>
+            <param name="hashedPassword">Hashed password string.</param>
+            <param name="providedPassword">Password in plaintext.</param>
+            <param name="user">for logging purposes</param>
+            <returns>True when the <paramref name="hashedPassword"/> and the hash of <paramref name="providedPassword"/> are the same.</returns>
+        </member>
+        <member name="T:ExternalServer.Common.Specifications.DataAccess.Communication.SslStreamOpenCallback">
+            <summary>
+            Callback delegate for an open ssl stream.
+            </summary>
+            <param name="stream">SslStream instance.</param>
+            <param name="tcpClient">Underlying tcp client.</param>
+        </member>
+        <member name="T:ExternalServer.Common.Specifications.DataAccess.Communication.ISslListener">
+            <summary>
+            A Tcp listener that sends and receives all packages over a ssl stream.
+            </summary>
+        </member>
+        <member name="E:ExternalServer.Common.Specifications.DataAccess.Communication.ISslListener.ClientConnectedEventHandler">
+            <summary>
+            Event that gets raised when a client connected successfully.
+            </summary>
+        </member>
+        <member name="M:ExternalServer.Common.Specifications.DataAccess.Communication.ISslListener.Start(System.Threading.CancellationToken,System.Net.IPEndPoint,System.Int32,System.Int32)">
+            <summary>
+            Starts listening on <paramref name="endPoint"/>.
+            Raises the ClientConnectedEventHandler event when a client connected.
+            </summary>
+            <param name="token">Cancellation token to stop listening and to close open connections.</param>
+            <param name="endPoint">Local endpoint to listen on.</param>
+            <param name="keepAliveInterval">0 or less, to deactivate keep alive. Value in s.</param>
+            <param name="receiveTimeout">Receive-Timeout in milliseconds.</param>
+        </member>
+        <member name="M:ExternalServer.Common.Specifications.DataAccess.Communication.ISslListener.SendMessage(System.Net.Security.SslStream,System.Byte[])">
+            <summary>
+            Sends data over the ssl stream to the client.
+            </summary>
+            <param name="sslStream">Open ssl stream to the client.</param>
+            <param name="msg">Data to send.</param>
+            <exception cref="T:ExternalServer.Common.Exceptions.ConnectionClosedException">Gets thrown when the cancellation got requested through the CancellationToken passed in Start().</exception>
+        </member>
+        <member name="M:ExternalServer.Common.Specifications.DataAccess.Communication.ISslListener.ReadMessage(System.Net.Security.SslStream)">
+            <summary>
+            Receives data from the <paramref name="sslStream"/>.
+            Aborts the operation when the cancellation got requested through the CancellationToken passed in Start().
+            </summary>
+            <param name="sslStream">Open ssl stream.</param>
+            <returns>Received byte array.</returns>
+        </member>
+        <member name="T:ExternalServer.Common.Specifications.DataAccess.Repositories.ICertificateRepository">
+            <summary>
+            Repository that loads certificates from the hard drive or the internal cache.
+            </summary>
+        </member>
+        <member name="M:ExternalServer.Common.Specifications.DataAccess.Repositories.ICertificateRepository.GetCertificate(System.String)">
+            <summary>
+            Gets a certificate from X509Store or from the internal cache.
+            Reloads a cached certificate after 5 days.
+            </summary>
+            <param name="filePath">File path where the certificate is stored.</param>
+            <returns>A X509 certificate that contains also it's private key.</returns>
+        </member>
+        <member name="T:ExternalServer.Common.Specifications.DataAccess.Repositories.IUserRepository">
+            <summary>
+            Administrates user entries in a database.
+            This repository gets currently not used anywhere.
+            </summary>
+        </member>
+        <member name="T:ExternalServer.Common.Specifications.DataAccess.Repositories.IWeatherRepository">
+            <summary>
+            Loads and caches weather forecasts.
+            </summary>
+        </member>
+        <member name="M:ExternalServer.Common.Specifications.DataAccess.Repositories.IWeatherRepository.GetCurrentWeatherPredictions(System.String)">
+            <summary>
+            Gets a weather forecase for a specific location.
+            </summary>
+            <param name="location">Name of a city.</param>
+            <returns>A task that represents an asynchronous operation. The value of the TResult
+            parameter contains a WeatherForecast object.</returns>
+        </member>
+        <member name="P:ExternalServer.Common.Specifications.DataObjects.IConnectRequestResult.PeerToPeerEndPoint">
+            <summary>
+            Public endpoint of the basestation.
+            Null if peer to peer is not possible.
+            </summary>
+        </member>
+        <member name="P:ExternalServer.Common.Specifications.DataObjects.IConnectRequestResult.TunnelId">
+            <summary>
+            Id of an already open connection from the basestation to the external server,
+            that can be used to relay packages from a mobile app to the basestation.
+            </summary>
+        </member>
+        <member name="P:ExternalServer.Common.Specifications.DataObjects.IConnectRequestResult.basestationStream">
+            <summary>
+            Null if basestation could not be reached.
+            </summary>
+        </member>
+        <member name="T:ExternalServer.Common.Specifications.DataObjects.IEFModel">
+            <summary>
+            Entity Framework Model
+            </summary>
+        </member>
+        <member name="T:ExternalServer.Common.Specifications.DataObjects.IServiceDetails">
+            <summary>
+            Used in WanPackages, when the user accesses this server via peer to peer or via the external server.
+            </summary>
+        </member>
+        <member name="M:ExternalServer.Common.Specifications.DataObjects.IUnmanagedMemoryObject.ClearMemory">
+            <summary>
+            Obfuscates and frees memory.
+            </summary>
+        </member>
+        <member name="T:ExternalServer.Common.Specifications.Jobs.IConnectorJob">
+            <summary>
+            Starts and stops all services that have something to do with connecting mobile apps to a basestation
+            or relaying packages.
+            </summary>
+        </member>
+        <member name="T:ExternalServer.Common.Specifications.Managers.ICertificateManager">
+            <summary>
+            Administrates the server certificate.
+            </summary>
+        </member>
+        <member name="M:ExternalServer.Common.Specifications.Managers.ICertificateManager.GetCertificate">
+            <summary>
+            Gets the server certificate.
+            </summary>
+            <returns>A X509Certificate containing the private key.</returns>
+        </member>
+        <member name="T:ExternalServer.Common.Specifications.Managers.IConnectionsManager">
+            <summary>
+            Manager that handles connections to basestations that are made for exchanging information about a
+            connection establishment of a mobile app.
+            </summary>
+        </member>
+        <member name="M:ExternalServer.Common.Specifications.Managers.IConnectionsManager.Start(System.Threading.CancellationToken)">
+            <summary>
+            Starts accepting connection requests form basestations and hold's them alive.
+            </summary>
+            <param name="token">Cancellation token to stop this service.</param>
+        </member>
+        <member name="M:ExternalServer.Common.Specifications.Managers.IConnectionsManager.SendUserConnectRequest(ExternalServer.Common.Models.Entities.ConnectRequest)">
+            <summary>
+            Notifies the basestation that a user want's to establish a connection.
+            The basestation will try to open a public port via STUN.
+            If that fails, all traffic will be relayed threw another connection to this server. (-> RelayManager)
+            </summary>
+            <param name="connectRequest">Information about the connect request of the mobile app.</param>
+            <returns>Containes if the baseastion was reachable and the Endpoint of the basestation if peer to peer is possible.</returns>
+            <seealso cref="T:ExternalServer.Common.Specifications.Managers.IRelayManager"/>
+        </member>
+        <member name="M:ExternalServer.Common.Specifications.Managers.IConnectionsManager.CleanupGhostConenctions">
+            <summary>
+            Removes closed connections from the list.
+            Gets called frequently by the ConnectorJob.
+            </summary>
+            <seealso cref="T:ExternalServer.Common.Specifications.Jobs.IConnectorJob"/>
+        </member>
+        <member name="T:ExternalServer.Common.Specifications.Managers.IRelayInitManager">
+            <summary>
+            Starts accepting relay requests from mobile apps
+            </summary>
+        </member>
+        <member name="T:ExternalServer.Common.Specifications.Managers.IRelayManager">
+            <summary>
+            Administrates relay connections to basestations.
+            </summary>
+        </member>
+        <member name="M:ExternalServer.Common.Specifications.Managers.ISettingsManager.GetApplicationSettings(ExternalServer.Common.Specifications.Managers.ICertificateManager)">
+            <param name="CertificateHandler">Must be set when confidential information should get decrypted.</param>
+            <returns>
+            Returns stored application settings.
+            If there are no stored settings then the default settings will be returned.
+            </returns>
+        </member>
+        <member name="M:ExternalServer.Common.Specifications.Managers.ISettingsManager.UpdateCurrentSettings(System.Func{ExternalServer.Common.Models.DTOs.ApplicationSettingsDto,ExternalServer.Common.Models.DTOs.ApplicationSettingsDto},ExternalServer.Common.Specifications.Managers.ICertificateManager)">
+            <summary>
+            Ensures that up to date settings get passed to updateFunc and
+            multiple threads can not change settings while calling this function.
+            </summary>
+            <param name="updateFunc">gets current settings and must return the changed settings</param>
+            <param name="CertificateHandler">Must be set when confidential information should get decrypted.</param>
+        </member>
+        <member name="M:ExternalServer.Common.Utilities.CryptoUtils.ObfuscateAndFreeMemory(System.IntPtr,System.Int64)">
+            <summary>
+            https://docs.microsoft.com/en-us/dotnet/api/system.io.unmanagedmemorystream?view=net-5.0
+            </summary>
+            <param name="memIntPtr">Pointer to the unmanaged memory</param>
+            <param name="length">Length of memory</param>
+        </member>
+        <member name="M:ExternalServer.Common.Utilities.CryptoUtils.MoveDataToUnmanagedMemory(System.Byte[])">
+            <summary>
+            Writes a byte array to unmanaged memory and obfuscates the original byte array.
+            </summary>
+            <param name="data"></param>
+            <returns>Pointer to the unmanaged memory.</returns>
+        </member>
+        <member name="M:ExternalServer.Common.Utilities.CryptoUtils.ObfuscateByteArray(System.Byte[])">
+            <summary>
+            Overwrites a byte array with random bytes.
+            </summary>
+        </member>
+        <member name="M:ExternalServer.Common.Utilities.CryptoUtils.GetByteArrayFromUM(System.Byte[],System.IntPtr,System.Int32)">
+            <summary>
+            Returns stored byte[] from intPtr.
+            Does not delete the unmanaged memory.
+            </summary>
+            <param name="result">array to store the data in</param>
+            <param name="intPtr">pointer pointing to the unmanaged memory</param>
+            <param name="length">length of data</param>
+        </member>
+        <member name="M:ExternalServer.Common.Utilities.SocketExtensions.IsConnected(System.Net.Sockets.Socket)">
+            <summary>
+            This Method is for Sockets were keep alives get send very frequently and the state must not be 100% accurate.
+            If that is not the case use IsConnected_UsingPoll()
+            </summary>
+            <param name="socket"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

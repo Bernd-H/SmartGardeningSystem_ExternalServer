@@ -8,6 +8,8 @@ using ExternalServer.Common.Specifications.DataObjects;
 using NLog;
 
 namespace ExternalServer.DataAccess.Repositories {
+
+    /// <inheritdoc/>
     public class CertificateRepository : ICertificateRepository {
 
         private IDictionary<string, ICachedObject> cachedCertificates;
@@ -20,26 +22,31 @@ namespace ExternalServer.DataAccess.Repositories {
             cachedCertificates = new Dictionary<string, ICachedObject>();
         }
 
+        /// <inheritdoc/>
         public X509Certificate2 GetCertificate(string filePath) {
-            if (cachedCertificates.ContainsKey(filePath)) {
-                // check lifespan
-                if (cachedCertificates[filePath].Lifetime.TotalDays < 5) {
-                    return cachedCertificates[filePath].Object as X509Certificate2;
+            lock (cachedCertificates) {
+                if (cachedCertificates.ContainsKey(filePath)) {
+                    // check lifespan
+                    if (cachedCertificates[filePath].Lifetime.TotalDays < 5) {
+                        return cachedCertificates[filePath].Object as X509Certificate2;
+                    }
+                    else {
+                        // delete cached object and load cert from store
+                        cachedCertificates.Remove(filePath);
+                        return GetCertificate(filePath);
+                    }
                 }
                 else {
-                    // delete cached object and load cert from store
-                    cachedCertificates.Remove(filePath);
-                    return GetCertificate(filePath);
-                }
-            }
-            else {
-                Logger.Info($"[GetCertificate]Loading certificate from {filePath}.");
-                var cert = getCertificate(filePath);
-                if (cert != null) {
-                    cachedCertificates.Add(filePath, new CachedObject(cert));
-                }
+                    Logger.Info($"[GetCertificate]Loading certificate from {filePath}.");
+                    var cert = getCertificate(filePath);
+                    if (cert != null) {
+                        //lock (cachedCertificates) {
+                        cachedCertificates.Add(filePath, new CachedObject(cert));
+                        //}
+                    }
 
-                return cert;
+                    return cert;
+                }
             }
         }
 

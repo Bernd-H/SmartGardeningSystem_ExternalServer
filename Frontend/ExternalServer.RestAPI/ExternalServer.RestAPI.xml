@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ExternalServer.RestAPI</name>
+    </assembly>
+    <members>
+        <member name="M:ExternalServer.RestAPI.Controllers.MobileAppControllers.ClientLoginController.generateJSONWebTokenForMobileApp(ExternalServer.Common.Models.Entities.User)">
+            <summary>
+            Creates a json web token of type "mobileapp" with a lifetime of 120 minutes.
+            </summary>
+        </member>
+        <member name="M:ExternalServer.RestAPI.Controllers.MobileAppControllers.ClientLoginController.AuthenticateUser(ExternalServer.Common.Models.Entities.User)">
+            <summary>
+            Checks if login credentials are correct.
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -8,6 +8,8 @@ using NLog;
 using OpenWeatherMap;
 
 namespace ExternalServer.DataAccess.Repositories {
+
+    /// <inheritdoc/>
     public class WeatherRepository : IWeatherRepository {
 
         private SemaphoreSlim locker = new SemaphoreSlim(1);
@@ -21,6 +23,7 @@ namespace ExternalServer.DataAccess.Repositories {
             openWeatherMapClient = new OpenWeatherMapClient("27ceba5613bb90cfe80904078d6f7887");
         }
 
+        /// <inheritdoc/>
         public async Task<WeatherForecast> GetCurrentWeatherPredictions(string location) {
             try {
                 await locker.WaitAsync(); // lock, because no information if openWeatherMapClient is threadsafe.

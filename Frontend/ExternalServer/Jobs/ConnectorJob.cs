@@ -10,6 +10,8 @@ using Microsoft.Extensions.Hosting;
 using NLog;
 
 namespace ExternalServer.Jobs {
+
+    /// <inheritdoc/>
     public class ConnectorJob : IHostedService, IConnectorJob {
 
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
@@ -33,6 +35,7 @@ namespace ExternalServer.Jobs {
             RelayManager = relayManager;
         }
 
+        /// <inheritdoc/>
         public Task StartAsync(CancellationToken cancellationToken) {
             Logger.Info($"[StartAsync]Starting ConnectionsManager.");
 
@@ -53,6 +56,7 @@ namespace ExternalServer.Jobs {
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public Task StopAsync(CancellationToken cancellationToken) {
             Logger.Info($"[StopAsync]Closing all open connections.");
 
