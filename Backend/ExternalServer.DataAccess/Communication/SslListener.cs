@@ -140,7 +140,7 @@ namespace ExternalServer.DataAccess.Communication {
         /// <inheritdoc/>
         public byte[] ReadMessage(SslStream sslStream) {
             // use the async method to be able to cancellate the receive process
-            return CommunicationUtils.ReceiveAsync(Logger, sslStream, _cancellationToken).Result;
+            return CommunicationUtils.ReceiveAsync(Logger, sslStream, cancellationToken: _cancellationToken).Result;
         }
 
         #region old BeginAccept methods and ConfigureKeepAlive

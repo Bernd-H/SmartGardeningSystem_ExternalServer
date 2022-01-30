@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Security;
@@ -49,7 +50,6 @@ namespace ExternalServer.BusinessLogic.Managers {
             int port = Convert.ToInt32(Configuration[ConfigurationVars.MOBILEAPPRELAYSERVICE_PORT]);
             Logger.Info($"[Start]Starting RelayInitializationManager.");
             SslListener.ClientConnectedEventHandler += OnMoblieAppConnected;
-            //SslListener.Start(cancellationToken, new IPEndPoint(IPAddress.Any, port), MoblieAppConnected, keepAliveInterval: 0, receiveTimeout: System.Threading.Timeout.Infinite);
             SslListener.Start(cancellationToken, new IPEndPoint(IPAddress.Any, port), keepAliveInterval: 0, receiveTimeout: System.Threading.Timeout.Infinite);
         }
 
@@ -98,6 +98,15 @@ namespace ExternalServer.BusinessLogic.Managers {
                         while (!_cancellationToken.IsCancellationRequested) {
                             // tunnel messages
                             var bytes_fromClient = SslListener.ReadMessage(stream);
+
+                            #region For debugging the SendLargePacketError20220130
+                            //if (!File.Exists("ExternalServer_receivedMsg.bin")) {
+                            //    // store the first received package for test reasons...
+                            //    Logger.Info($"[OnMoblieAppConnected]Storing the received package in ExternalServer_receivedMsg.bin");
+                            //    File.WriteAllBytes("ExternalServer_receivedMsg.bin", bytes_fromClient);
+                            //}
+                            #endregion
+
                             Logger.Info($"[OnMoblieAppConnected]Tunneling {bytes_fromClient.Length} bytes to basestation.");
                             SslListener.SendMessage(basestationStream, bytes_fromClient);
                             var bytes_fromBasestation = SslListener.ReadMessage(basestationStream);
