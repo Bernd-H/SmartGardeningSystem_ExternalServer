@@ -10,5 +10,44 @@
         <member name="M:ExternalServer.BusinessLogic.Cryptography.PasswordHasher.VerifyHashedPassword(System.Guid,System.String,System.Byte[])">
             <inheritdoc/>
         </member>
+        <member name="T:ExternalServer.BusinessLogic.LoggerService">
+            <inheritdoc/>
+        </member>
+        <member name="M:ExternalServer.BusinessLogic.LoggerService.GetLogger``1">
+            <inheritdoc/>
+        </member>
+        <member name="T:ExternalServer.BusinessLogic.Managers.CertificateManager">
+            <inheritdoc/>
+        </member>
+        <member name="M:ExternalServer.BusinessLogic.Managers.CertificateManager.GetCertificate">
+            <inheritdoc/>
+        </member>
+        <member name="T:ExternalServer.BusinessLogic.Managers.ConnectionsManager">
+            <inheritdoc/>
+        </member>
+        <member name="M:ExternalServer.BusinessLogic.Managers.ConnectionsManager.CleanupGhostConenctions">
+            <inheritdoc/>
+        </member>
+        <member name="M:ExternalServer.BusinessLogic.Managers.ConnectionsManager.SendUserConnectRequest(ExternalServer.Common.Models.Entities.ConnectRequest)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ExternalServer.BusinessLogic.Managers.ConnectionsManager.Start(System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="T:ExternalServer.BusinessLogic.Managers.RelayInitManager">
+            <inheritdoc/>
+        </member>
+        <member name="M:ExternalServer.BusinessLogic.Managers.RelayInitManager.Start(System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="T:ExternalServer.BusinessLogic.Managers.RelayManager">
+            <inheritdoc/>
+        </member>
+        <member name="M:ExternalServer.BusinessLogic.Managers.RelayManager.Start(System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ExternalServer.BusinessLogic.Managers.RelayManager.GetTunnelToBasestation(System.Guid)">
+            <inheritdoc/>
+        </member>
     </members>
 </doc>

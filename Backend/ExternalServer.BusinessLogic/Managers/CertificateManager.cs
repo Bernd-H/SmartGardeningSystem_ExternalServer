@@ -7,6 +7,8 @@ using Microsoft.Extensions.Configuration;
 using NLog;
 
 namespace ExternalServer.BusinessLogic.Managers {
+
+    /// <inheritdoc/>
     public class CertificateManager : ICertificateManager {
 
         private ILogger Logger;
@@ -21,6 +23,7 @@ namespace ExternalServer.BusinessLogic.Managers {
             Configuration = configuration;
         }
 
+        /// <inheritdoc/>
         public X509Certificate2 GetCertificate() {
             return CertificateRepository.GetCertificate(Configuration[ConfigurationVars.CERTIFICATE_FILEPATH]);
         }

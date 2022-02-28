@@ -22,6 +22,7 @@ using NLog;
 
 namespace ExternalServer.BusinessLogic.Managers {
 
+    /// <inheritdoc/>
     public class ConnectionsManager : IConnectionsManager {
 
         private class Connection {
@@ -46,6 +47,7 @@ namespace ExternalServer.BusinessLogic.Managers {
             _connections = new Dictionary<Guid, Connection>();
         }
 
+        /// <inheritdoc/>
         public void CleanupGhostConenctions() {
             Logger.Info($"[CleanupGhostConenctions]Checking connections.");
             lock (_connections) {
@@ -64,6 +66,7 @@ namespace ExternalServer.BusinessLogic.Managers {
             }
         }
 
+        /// <inheritdoc/>
         public IConnectRequestResult SendUserConnectRequest(ConnectRequest connectRequest) {
             var basestationId = connectRequest.BasestationId;
 
@@ -121,6 +124,7 @@ namespace ExternalServer.BusinessLogic.Managers {
             return new ConnectRequestResult();
         }
 
+        /// <inheritdoc/>
         public void Start(CancellationToken token) {
             int port = Convert.ToInt32(Configuration[ConfigurationVars.BASESTATIONCONNECTIONSERVICE_PORT]);
             SslListener.ClientConnectedEventHandler += ClientConnected;

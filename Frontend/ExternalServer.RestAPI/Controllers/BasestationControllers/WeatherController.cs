@@ -22,14 +22,14 @@ namespace ExternalServer.RestAPI.Controllers.BasestationControllers {
 
         // GET api/<WeatherController>
         [HttpGet("{location}")]
-        public ActionResult<WeatherForecast> GetWeather(string location) {
+        public ActionResult<WeatherData> GetWeather(string location) {
             if (ControllerHelperClass.CallerIsBasestation(HttpContext)) {
                 if (string.IsNullOrEmpty(location)) {
                     return BadRequest();
                 }
 
-                Logger.Info($"[GetWeather]Weather forecast requested.");
-                return WeatherRepository.GetCurrentWeatherPredictions(location).Result;
+                Logger.Info($"[GetWeather]Weather data requested.");
+                return WeatherRepository.GetWeatherForecastAndHistory(location).Result;
             }
 
             return Unauthorized();

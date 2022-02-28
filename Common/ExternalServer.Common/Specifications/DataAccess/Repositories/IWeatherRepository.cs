@@ -9,11 +9,11 @@ namespace ExternalServer.Common.Specifications.DataAccess.Repositories {
     public interface IWeatherRepository {
 
         /// <summary>
-        /// Gets a weather forecase for a specific location.
+        /// Gets a weather forecast and historical data of the previous day for a specific location.
         /// </summary>
         /// <param name="location">Name of a city.</param>
         /// <returns>A task that represents an asynchronous operation. The value of the TResult
         /// parameter contains a WeatherForecast object.</returns>
-        Task<WeatherForecast> GetCurrentWeatherPredictions(string location);
+        Task<WeatherData> GetWeatherForecastAndHistory(string location);
     }
 }

@@ -21,6 +21,8 @@ using Newtonsoft.Json;
 using NLog;
 
 namespace ExternalServer.BusinessLogic.Managers {
+
+    /// <inheritdoc/>
     public class RelayInitManager : IRelayInitManager {
 
         private CancellationToken _cancellationToken;
@@ -45,6 +47,7 @@ namespace ExternalServer.BusinessLogic.Managers {
             RelayManager = relayManager;
         }
 
+        /// <inheritdoc/>
         public void Start(CancellationToken cancellationToken) {
             _cancellationToken = cancellationToken;
             int port = Convert.ToInt32(Configuration[ConfigurationVars.MOBILEAPPRELAYSERVICE_PORT]);

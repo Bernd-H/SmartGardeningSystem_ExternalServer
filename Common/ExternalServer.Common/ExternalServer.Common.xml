@@ -162,6 +162,18 @@
             Obfuscates and frees memory.
             </summary>
         </member>
+        <member name="T:ExternalServer.Common.Specifications.ILoggerService">
+            <summary>
+            Class to get an NLog logger for a specific class.
+            </summary>
+        </member>
+        <member name="M:ExternalServer.Common.Specifications.ILoggerService.GetLogger``1">
+            <summary>
+            Gets a NLog logger instance.
+            </summary>
+            <typeparam name="T">Type of the class the logger is for.</typeparam>
+            <returns>Logger for class with type <typeparamref name="T"/>.</returns>
+        </member>
         <member name="T:ExternalServer.Common.Specifications.Jobs.IConnectorJob">
             <summary>
             Starts and stops all services that have something to do with connecting mobile apps to a basestation
@@ -217,21 +229,6 @@
             <summary>
             Administrates relay connections to basestations.
             </summary>
-        </member>
-        <member name="M:ExternalServer.Common.Specifications.Managers.ISettingsManager.GetApplicationSettings(ExternalServer.Common.Specifications.Managers.ICertificateManager)">
-            <param name="CertificateHandler">Must be set when confidential information should get decrypted.</param>
-            <returns>
-            Returns stored application settings.
-            If there are no stored settings then the default settings will be returned.
-            </returns>
-        </member>
-        <member name="M:ExternalServer.Common.Specifications.Managers.ISettingsManager.UpdateCurrentSettings(System.Func{ExternalServer.Common.Models.DTOs.ApplicationSettingsDto,ExternalServer.Common.Models.DTOs.ApplicationSettingsDto},ExternalServer.Common.Specifications.Managers.ICertificateManager)">
-            <summary>
-            Ensures that up to date settings get passed to updateFunc and
-            multiple threads can not change settings while calling this function.
-            </summary>
-            <param name="updateFunc">gets current settings and must return the changed settings</param>
-            <param name="CertificateHandler">Must be set when confidential information should get decrypted.</param>
         </member>
         <member name="M:ExternalServer.Common.Utilities.CryptoUtils.ObfuscateAndFreeMemory(System.IntPtr,System.Int64)">
             <summary>

@@ -15,6 +15,8 @@ using Microsoft.Extensions.Configuration;
 using NLog;
 
 namespace ExternalServer.BusinessLogic.Managers {
+
+    /// <inheritdoc/>
     public class RelayManager : IRelayManager {
 
         private ConcurrentDictionary<Guid, SslStream> openTunnels = new ConcurrentDictionary<Guid, SslStream>();
@@ -32,6 +34,7 @@ namespace ExternalServer.BusinessLogic.Managers {
             SslListener = sslListener;
         }
 
+        /// <inheritdoc/>
         public void Start(CancellationToken cancellationToken) {
             cancellationToken.Register(() => Stop());
             int port = Convert.ToInt32(Configuration[ConfigurationVars.BASESTATIONRELAYTUNNEL_PORT]);
@@ -41,6 +44,7 @@ namespace ExternalServer.BusinessLogic.Managers {
             //SslListener.Start(cancellationToken, new IPEndPoint(IPAddress.Any, port), BasestationConnected, keepAliveInterval: 0, receiveTimeout: System.Threading.Timeout.Infinite);
         }
 
+        /// <inheritdoc/>
         public SslStream GetTunnelToBasestation(Guid tunnelId) {
             return openTunnels.GetValueOrDefault(tunnelId, defaultValue: null);
         }

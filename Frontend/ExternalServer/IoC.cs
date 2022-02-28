@@ -50,7 +50,6 @@ namespace ExternalServer {
 
             /// business logic
             // managers
-            containerBuilder.RegisterType<SettingsManager>().As<ISettingsManager>();
             containerBuilder.RegisterType<CertificateManager>().As<ICertificateManager>();
             containerBuilder.RegisterType<ConnectionsManager>().As<IConnectionsManager>().SingleInstance();
             containerBuilder.RegisterType<RelayInitManager>().As<IRelayInitManager>().SingleInstance();
