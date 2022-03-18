@@ -3,7 +3,7 @@
 namespace ExternalServer.Common.Specifications {
 
     /// <summary>
-    /// Class to get an NLog logger for a specific class.
+    /// Class to get an NLog logger instance for a specific class.
     /// </summary>
     public interface ILoggerService {
 

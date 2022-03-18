@@ -1,7 +1,7 @@
 ﻿{
   "applicationSettings_fileName": "settings",
 
-  "certificate_filePath": "cert.p12",
+  "certificate_filePath": "cert_2022_03_03.p12",
   //"certificate_filePath": "C:\\Users\\bernd\\Documents\\Schule\\Diplomarbeit\\XCADatenbank\\djcodex.com\\cert.p12",
 
   /// cryptography

@@ -6,6 +6,11 @@ using ExternalServer.Common.Specifications.DataObjects;
 using NLog;
 
 namespace ExternalServer.DataAccess.Database {
+
+    /// <summary>
+    /// Base class of all database repositories.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public abstract class DbBaseRepository<T> : IDisposable where T : class, IEFModel {
 
         protected DatabaseContext context { get; private set; }

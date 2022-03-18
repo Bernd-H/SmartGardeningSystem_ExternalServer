@@ -34,17 +34,17 @@ namespace ExternalServer.Common.Models.Entities {
         #endregion
 
         public WeatherData() {
-            Temp_min = float.NaN;
-            Temp_max = float.NaN;
-            Pressure = float.NaN;
-            Humidity = float.NaN;
-            WindSpeed = float.NaN;
-            PrecipitationVolume_mm = float.NaN;
-            MaximumUVIndex = float.NaN;
+            Temp_min = 0;
+            Temp_max = 0;
+            Pressure = 0;
+            Humidity = 0;
+            WindSpeed = 0;
+            PrecipitationVolume_mm = 0;
+            MaximumUVIndex = 0;
             Day = DateTime.MinValue;
             From = DateTime.MinValue;
             To = DateTime.MinValue;
-            AmountOfRainInMm = float.NaN;
+            AmountOfRainInMm = 0;
         }
     }
 }

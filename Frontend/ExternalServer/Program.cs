@@ -13,6 +13,10 @@ using Microsoft.Extensions.Logging;
 using NLog.Web;
 
 namespace ExternalServer {
+
+    /// <summary>
+    /// Class containing the starting point of the application.
+    /// </summary>
     public class Program {
         public static void Main(string[] args) {
             var logger = NLogBuilder.ConfigureNLog("NLog.config").GetCurrentClassLogger();

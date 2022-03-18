@@ -15,6 +15,10 @@ using ExternalServer.Jobs;
 using Microsoft.Extensions.Configuration;
 
 namespace ExternalServer {
+
+    /// <summary>
+    /// Class that provides access to the autofac dependency container.
+    /// </summary>
     public static class IoC {
 
         private static IContainer applicationContext;

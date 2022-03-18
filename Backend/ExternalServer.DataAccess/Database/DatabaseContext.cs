@@ -2,6 +2,10 @@
 using Microsoft.EntityFrameworkCore;
 
 namespace ExternalServer.DataAccess.Database {
+
+    /// <summary>
+    /// Inherits from DbContext. Class that contains the connection string for the mysql database and multiple tables as DbSet instance.
+    /// </summary>
     public class DatabaseContext : DbContext {
 
         // DbSet names must be lower case. Else there are problems on linux

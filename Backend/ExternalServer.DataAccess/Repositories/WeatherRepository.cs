@@ -47,7 +47,7 @@ namespace ExternalServer.DataAccess.Repositories {
             }
         }
 
-        private async Task<WeatherData> getHistoricalDailyData(string lat = "48.43", string lon = "16.12", WeatherData weatherData) {
+        private async Task<WeatherData> getHistoricalDailyData(string lat = "48.43", string lon = "16.12", WeatherData weatherData = null) {
             try {
                 using (var client = new HttpClient()) {
                     HttpResponseMessage response = await client.GetAsync($"https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&exclude=current,minutely,hourly,alerts&appid={AppId}&units=metric");
@@ -56,7 +56,7 @@ namespace ExternalServer.DataAccess.Repositories {
                     // parse response
                     string json = Encoding.UTF8.GetString(response.Content.ReadAsByteArrayAsync().Result);
                     var jsonData = JObject.Parse(json);
-                    var dailyData = jsonData.SelectToken("daily").Values().ToList();
+                    var dailyData = jsonData.SelectToken("daily");
 
                     double time = dailyData[0].SelectToken("dt").Value<double>();
                     float tempMin = dailyData[0].SelectToken("temp").SelectToken("min").Value<float>();

@@ -10,6 +10,7 @@ using NLog;
 namespace ExternalServer.DataAccess.Repositories {
 
     /// <inheritdoc/>
+    [Obsolete]
     public class UserRepository : DbBaseRepository<User>, IUserRepository {
 
         private ILogger Logger;

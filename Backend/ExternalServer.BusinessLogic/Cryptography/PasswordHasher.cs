@@ -8,6 +8,7 @@ using NLog;
 namespace ExternalServer.BusinessLogic.Cryptography {
 
     /// <inheritdoc/>
+    [Obsolete]
     public sealed class PasswordHasher : IPasswordHasher {
         private const int SaltSize = 16; // 128 bit 
         private const int KeySize = 32; // 256 bit

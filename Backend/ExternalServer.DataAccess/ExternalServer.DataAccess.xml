@@ -25,6 +25,17 @@
             </summary>
             <param name="client"></param>
         </member>
+        <member name="T:ExternalServer.DataAccess.Database.DatabaseContext">
+            <summary>
+            Inherits from DbContext. Class that contains the connection string for the mysql database and multiple tables as DbSet instance.
+            </summary>
+        </member>
+        <member name="T:ExternalServer.DataAccess.Database.DbBaseRepository`1">
+            <summary>
+            Base class of all database repositories.
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
         <member name="T:ExternalServer.DataAccess.Repositories.CertificateRepository">
             <inheritdoc/>
         </member>
@@ -57,7 +68,7 @@
         <member name="T:ExternalServer.DataAccess.Repositories.WeatherRepository">
             <inheritdoc/>
         </member>
-        <member name="M:ExternalServer.DataAccess.Repositories.WeatherRepository.GetCurrentWeatherPredictions(System.String)">
+        <member name="M:ExternalServer.DataAccess.Repositories.WeatherRepository.GetWeatherForecastAndHistory(System.String)">
             <inheritdoc/>
         </member>
     </members>

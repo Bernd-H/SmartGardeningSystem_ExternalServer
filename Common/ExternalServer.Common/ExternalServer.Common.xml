@@ -122,9 +122,9 @@
             Loads and caches weather forecasts.
             </summary>
         </member>
-        <member name="M:ExternalServer.Common.Specifications.DataAccess.Repositories.IWeatherRepository.GetCurrentWeatherPredictions(System.String)">
+        <member name="M:ExternalServer.Common.Specifications.DataAccess.Repositories.IWeatherRepository.GetWeatherForecastAndHistory(System.String)">
             <summary>
-            Gets a weather forecase for a specific location.
+            Gets a weather forecast and historical data of the previous day for a specific location.
             </summary>
             <param name="location">Name of a city.</param>
             <returns>A task that represents an asynchronous operation. The value of the TResult
@@ -164,7 +164,7 @@
         </member>
         <member name="T:ExternalServer.Common.Specifications.ILoggerService">
             <summary>
-            Class to get an NLog logger for a specific class.
+            Class to get an NLog logger instance for a specific class.
             </summary>
         </member>
         <member name="M:ExternalServer.Common.Specifications.ILoggerService.GetLogger``1">

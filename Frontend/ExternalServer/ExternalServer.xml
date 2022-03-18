@@ -4,6 +4,11 @@
         <name>ExternalServer</name>
     </assembly>
     <members>
+        <member name="T:ExternalServer.IoC">
+            <summary>
+            Class that provides access to the autofac dependency container.
+            </summary>
+        </member>
         <member name="M:ExternalServer.IoC.Init">
             <summary>
             Registers all types to a internal containerbuilder.
@@ -32,6 +37,11 @@
         </member>
         <member name="M:ExternalServer.Jobs.ConnectorJob.StopAsync(System.Threading.CancellationToken)">
             <inheritdoc/>
+        </member>
+        <member name="T:ExternalServer.Program">
+            <summary>
+            Class containing the starting point of the application.
+            </summary>
         </member>
     </members>
 </doc>
