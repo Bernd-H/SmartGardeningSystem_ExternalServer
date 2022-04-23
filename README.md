@@ -3,7 +3,8 @@ This repository contains the source code of the external Server, which was build
 # ExternalServer
 The external server of the gardening system ensures that all connected basestations get weather forecasts and historic weather data. The external Server also exchanges information to connect a mobile app to a specific basestation and relays packages when a direct connection from the mobile app to the basestation is not possible (because of a NAT for example).
 
-# License
+## License
 This project is licensed under the GPLv3 license.
 
-# Contact
+## Contact
+github.smartgardeningsystem@gmail.com
