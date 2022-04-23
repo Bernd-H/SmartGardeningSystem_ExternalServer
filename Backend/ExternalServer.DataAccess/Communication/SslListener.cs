@@ -121,7 +121,7 @@ namespace ExternalServer.DataAccess.Communication {
 
         private void ConfigureKeepAlive(TcpClient client) {
             if (_keepAliveInterval > 0) {
-                Logger.Info($"[ConfigureKeepAlive]Settings keep alive interval to {_keepAliveInterval}s for connection with endpoint {client.Client.RemoteEndPoint}.");
+                Logger.Info($"[ConfigureKeepAlive]Setting keep alive interval to {_keepAliveInterval}s for connection with endpoint {client.Client.RemoteEndPoint}.");
 
                 client.Client.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveTime, _keepAliveInterval);
                 client.Client.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveInterval, 5);

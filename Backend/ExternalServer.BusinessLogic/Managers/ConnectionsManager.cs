@@ -144,7 +144,7 @@ namespace ExternalServer.BusinessLogic.Managers {
                 // send ack
                 SslListener.SendMessage(stream, CommunicationCodes.ACK);
 
-                Logger.Info($"[ClientConnected]Accommodate bastation with id={basestationId.ToString()} to the list.");
+                Logger.Info($"[ClientConnected]Accommodating bastation with id={basestationId.ToString()} to the list.");
 
                 lock (_connections) {
                     if (_connections.ContainsKey(basestationId)) {
