@@ -54,7 +54,8 @@ namespace ExternalServer.BusinessLogic.Managers {
                 List<Guid> connectionsToRemove = new List<Guid>();
 
                 foreach (var c in _connections) {
-                    if (!c.Value.client.Client.IsConnected()) {
+                    //if (!c.Value.client.Client.IsConnected()) {
+                    if (!c.Value.client.Client.IsConnected_UsingPoll()) {
                         connectionsToRemove.Add(c.Key);
                     }
                 }
